@@ -3,6 +3,8 @@
 #get the directly of where this script is run, and consequently where the files are located
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 
+cd $SCRIPTPATH
+
 #init and update if we haven't already
 git submodule init
 git submodule update
@@ -43,6 +45,7 @@ backupIfNotSymlink ~/.tmux.reset.conf
 backupIfNotSymlink ~/.tmux.colors.conf
 backupIfNotSymlink ~/.tmux.system.conf
 backupIfNotSymlink ~/.zshrc
+backupIfNotSymlink ~/.zshrc.system
 backupIfNotSymlink ~/.vimrc.local
 backupIfNotSymlink ~/.dircolors
 
