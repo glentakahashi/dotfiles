@@ -4,3 +4,10 @@ map <C-L> :execute "tabmove" tabpagenr() <CR>
 map <leader>y "+y
 map <leader>p "+p
 filetype indent on
+
+"this will take getting used to
+inoremap kj <Esc>
+"vnoremap kj <Esc>
+"noremap pp p
+"nmap pw viwpp
+"nmap py Vpp
