@@ -44,23 +44,19 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
-#java
-export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-amd64/jre
+# load system specific overrides
+source ~/.zshrc.system
 
-# Customize to your needs...
-export PATH=$PATH:/usr/local/bin/:/usr/bin/:~/bin/:/usr/local/lib64/
+# load local overrides
+source ~/.zshrc.local
 
 #aliases
 alias reload-zshrc='source ~/.zshrc'
 alias grip='grep -riI'
-
 #simple http server
 alias http='python -m SimpleHTTPServer'
 
 #fixes
 #export TERM=screen-256color-bce
-export TERM=xterm-256color
 #export TERM=screen-256color
-
-#dircolors
-eval `dircolors ~/.dircolors`
+export TERM=xterm-256color

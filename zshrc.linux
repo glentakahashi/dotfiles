@@ -1,0 +1,7 @@
+#Linux specific overrides
+
+#dircolors
+eval `dircolors ~/.dircolors`
+
+export PATH=$PATH:/usr/local/bin/:/usr/bin/:~/bin/:/usr/local/lib64/
+export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-amd64/jre
