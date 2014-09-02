@@ -2,5 +2,6 @@
 Not guaranteed to work...
 
 
-TODO: cleanup plugins and stuff
-      set up jj to be ESC
+TODO:
+* set up kj to be ESC
+* remove dependencies for spf13 and oh my zsh
