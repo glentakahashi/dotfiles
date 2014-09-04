@@ -60,3 +60,6 @@ alias http='python -m SimpleHTTPServer'
 #export TERM=screen-256color-bce
 #export TERM=screen-256color
 export TERM=xterm-256color
+
+#vimode!
+#bindkey -v

@@ -60,13 +60,8 @@ ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s $SCRIPTPATH/dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 
 #these two files depend upon system type
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    ln -v -s $SCRIPTPATH/tmux.linux.conf ~/.tmux.system.conf
-    ln -v -s $SCRIPTPATH/zshrc.linux ~/.zshrc.system
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    ln -v -s $SCRIPTPATH/tmux.mac.conf ~/.tmux.system.conf
-    ln -v -s $SCRIPTPATH/zshrc.mac ~/.zshrc.system
-fi
+ln -s $SCRIPTPATH/$OSTYPE/tmux.system.conf ~/.tmux.system.conf
+ln -s $SCRIPTPATH/$OSTYPE/zshrc.system ~/.zshrc.system
 
 #create the local changes files if they don't exist
 touch ~/.tmux.local.conf
