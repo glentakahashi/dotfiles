@@ -4,6 +4,7 @@
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 
 cd $SCRIPTPATH
+SYSTEM=${OSTYPE//[0-9.]/}
 
 #warn if they already have one of the .bak files that exists
 if [[  -e ~/.tmux.conf.bak || -e ~/.tmux.reset.conf.bak \
@@ -60,8 +61,8 @@ ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s $SCRIPTPATH/dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 
 #these two files depend upon system type
-ln -s $SCRIPTPATH/$OSTYPE/tmux.system.conf ~/.tmux.system.conf
-ln -s $SCRIPTPATH/$OSTYPE/zshrc.system ~/.zshrc.system
+ln -s $SCRIPTPATH/$SYSTEM/tmux.system.conf ~/.tmux.system.conf
+ln -s $SCRIPTPATH/$SYSTEM/zshrc.system ~/.zshrc.system
 
 #create the local changes files if they don't exist
 touch ~/.tmux.local.conf
