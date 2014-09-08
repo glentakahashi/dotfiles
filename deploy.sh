@@ -3,7 +3,6 @@
 #get the directly of where this script is run, and consequently where the files are located
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 
-cd $SCRIPTPATH
 SYSTEM=${OSTYPE//[0-9.]/}
 
 #warn if they already have one of the .bak files that exists
@@ -28,6 +27,8 @@ if [[  -e ~/.tmux.conf.bak || -e ~/.tmux.reset.conf.bak \
     done
 fi
 
+#git depends on being in directory, so cd to directory first
+cd $SCRIPTPATH
 #init and update if we haven't already
 echo Updating submodules...
 git submodule init
