@@ -11,3 +11,6 @@ test -e ~/.dircolors && eval `dircolors -b ~/.dircolors`
 alias ls="ls --color=always" 
 alias grep="grep --color=always"
 alias egrep="egrep --color=always"
+
+export LC_CTYPE=C
+export LANG=C
