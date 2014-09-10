@@ -57,7 +57,7 @@ alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
 #cdmotion
-source $ADDONS/cdmotion.sh
+source $ADDONS/cdmotion/cdmotion.sh
 alias ,='cdmotion'
 
 #fixes

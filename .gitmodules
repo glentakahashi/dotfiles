@@ -58,3 +58,6 @@
 [submodule "vim/vim-pathogen"]
 	path = vim/vim-pathogen
 	url = git@github.com:tpope/vim-pathogen.git
+[submodule "zsh/cdmotion"]
+	path = zsh/cdmotion
+	url = git@github.com:glentakahashi/cdmotion.git
