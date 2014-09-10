@@ -51,6 +51,7 @@ backupIfNotSymlink ~/.zshrc
 backupIfNotSymlink ~/.zshrc.system
 backupIfNotSymlink ~/.vimrc
 backupIfNotSymlink ~/.dircolors
+rm -rf ~/.vim.bak
 backupIfNotSymlink ~/.vim
 
 #make the new symlinks
@@ -72,6 +73,8 @@ touch ~/.vimrc.local
 
 #install bundles
 echo Creating .vim/autoload and .vim/bundle
-mkdir ~/.vim
+mkdir -p ~/.vim
+rm -f ~/.vim/autoload
+rm -f ~/.vim/bundle
 ln -v -s $SCRIPTPATH/vim/vim-pathogen/autoload ~/.vim/autoload
 ln -v -s $SCRIPTPATH/vim/bundle ~/.vim/bundle

@@ -5,7 +5,7 @@
 	path = tmux-colors-solarized
 	url = git@github.com:seebi/tmux-colors-solarized.git
 [submodule "vim/autoload/vim-pathogen"]
-	path = vim/autoload/vim-pathogen
+	path = vim/vim-pathogen
 	url = git@github.com:tpope/vim-pathogen.git
 [submodule "vim/bundle/nerdtree"]
 	path = vim/bundle/nerdtree
