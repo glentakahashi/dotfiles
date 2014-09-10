@@ -12,5 +12,6 @@ alias ls="ls --color=always"
 alias grep="grep --color=always"
 alias egrep="egrep --color=always"
 
-export LC_CTYPE=C
-export LANG=C
+#fix for sed for mac
+#we cannot export those because it screws over terminal encoding
+alias sed="LC_ALL=C sed"
