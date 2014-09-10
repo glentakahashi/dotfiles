@@ -9,7 +9,8 @@ SYSTEM=${OSTYPE//[0-9.]/}
 if [[  -e ~/.tmux.conf.bak || -e ~/.tmux.reset.conf.bak \
     || -e ~/.tmux.colors.conf.bak || -e ~/.tmux.system.conf.bak \
     || -e ~/.zshrc.bak || -e ~/.vimrc.bak \
-    || -e ~/.dircolors.bak ]]; then
+    || -e ~/.dircolors.bak || -e ~/.vim.bak
+    || -e ~/.zsh.bak ]]; then
     echo "Warning! one or more *.bak files exist in your home directory that may get overwritten!"
     read -p "Continue? [y/n]" yn
     while true; do
@@ -53,6 +54,7 @@ backupIfNotSymlink ~/.vimrc
 backupIfNotSymlink ~/.dircolors
 rm -rf ~/.vim.bak
 backupIfNotSymlink ~/.vim
+backupIfNotSymlink ~/.zsh
 
 #make the new symlinks
 ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf
@@ -61,6 +63,7 @@ ln -v -s $SCRIPTPATH/tmux-colors-solarized/tmuxcolors-256.conf ~/.tmux.colors.co
 ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
 ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s $SCRIPTPATH/dircolors-solarized/dircolors.ansi-dark ~/.dircolors
+ln -v -s $SCRIPTPATH/zsh ~/.zsh
 
 #these two files depend upon system type
 ln -s $SCRIPTPATH/$SYSTEM/tmux.system.conf ~/.tmux.system.conf

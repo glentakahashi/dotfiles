@@ -1,5 +1,6 @@
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
+ADDONS=$HOME/.zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -55,6 +56,9 @@ alias reload-zshrc='source ~/.zshrc'
 alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
+#cdmotion
+source $ADDONS/cdmotion.sh
+alias ,='cdmotion'
 
 #fixes
 #export TERM=screen-256color-bce

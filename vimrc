@@ -6,12 +6,6 @@ execute pathogen#infect()
 syntax on
 filetype plugin indent on
 
-if has ('x') && has ('gui') " On Linux use + register for copy-paste
-  set clipboard=unnamedplus
-elseif has ('gui')          " On mac and Windows, use * register for copy-paste
-  set clipboard=unnamed
-endif
-
 set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set virtualedit=onemore             " Allow for cursor beyond last character
@@ -26,6 +20,7 @@ if has('persistent_undo')
 endif
 
 color solarized                 " Load a colorscheme
+set background=dark
 
 set tabpagemax=15               " Only show 15 tabs
 set showmode                    " Display the current mode
@@ -205,8 +200,6 @@ map zh zH
         let NERDTreeKeepTreeInNewTab=1
         let g:nerdtree_tabs_open_on_gui_startup=0
     " }
-
-
 
 if has("user_commands")
   command! -bang -nargs=* -complete=file E e<bang> <args>
