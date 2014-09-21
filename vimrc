@@ -1,6 +1,8 @@
 set nocompatible
 scriptencoding utf-8
 
+let mapleader = ','
+
 "Pathogen stuff
 execute pathogen#infect()
 syntax on
@@ -10,15 +12,20 @@ set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set virtualedit=onemore             " Allow for cursor beyond last character
 set history=1000                    " Store a ton of history (default is 20)
+"TODO: actually utilize this
 set spell                           " Spell checking on
 
 set backup                  " Backups are nice ...
 if has('persistent_undo')
-    set undofile                " So is persistent undo ...
-    set undolevels=1000         " Maximum number of changes that can be undone
-    set undoreload=10000        " Maximum number lines to save for undo on a buffer reload
+  set undofile                " So is persistent undo ...
+  set undolevels=1000         " Maximum number of changes that can be undone
+  set undoreload=10000        " Maximum number lines to save for undo on a buffer reload
 endif
 
+
+if &term == 'xterm' || &term == 'screen'
+  set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
+endif
 color solarized                 " Load a colorscheme
 set background=dark
 
@@ -27,81 +34,79 @@ set showmode                    " Display the current mode
 set cursorline                  " Highlight current line
 
 if has('statusline')
-    set laststatus=2
+  set laststatus=2
 
-    " Broken down into easily includeable segments
-    set statusline=%<%f\                     " Filename
-    set statusline+=%w%h%m%r                 " Options
-    set statusline+=%{fugitive#statusline()} " Git Hotness
-    set statusline+=\ [%{&ff}/%Y]            " Filetype
-    set statusline+=\ [%{getcwd()}]          " Current dir
-    set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
+  " Broken down into easily includeable segments
+  set statusline=%<%f\                     " Filename
+  set statusline+=%w%h%m%r                 " Options
+  set statusline+=%{fugitive#statusline()} " Git Hotness
+  set statusline+=\ [%{&ff}/%Y]            " Filetype
+  set statusline+=\ [%{getcwd()}]          " Current dir
+  set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
 
-    let g:airline_theme='powerlineish'       " airline users use the powerline theme
-    let g:airline_powerline_fonts=1          " and the powerline fonts
+  let g:airline_theme='powerlineish'       " airline users use the powerline theme
+  let g:airline_powerline_fonts=1          " and the powerline fonts
 endif
-    " indent_guides {
-        if !exists('g:spf13_no_indent_guides_autocolor')
-            let g:indent_guides_auto_colors = 1
-        else
-            " For some colorschemes, autocolor will not work (eg: 'desert', 'ir_black')
-            autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=#212121 ctermbg=3
-            autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=#404040 ctermbg=4
-        endif
-        let g:indent_guides_start_level = 2
-        let g:indent_guides_guide_size = 1
-        let g:indent_guides_enable_on_vim_startup = 1
-    " }
-    " Initialize directories {
-    function! InitializeDirectories()
-        let parent = $HOME
-        let prefix = 'vim'
-        let dir_list = {
-                    \ 'backup': 'backupdir',
-                    \ 'views': 'viewdir',
-                    \ 'swap': 'directory' }
 
-        if has('persistent_undo')
-            let dir_list['undo'] = 'undodir'
-        endif
+" indent_guides {
+let g:indent_guides_auto_colors = 1
+let g:indent_guides_start_level = 2
+let g:indent_guides_guide_size = 1
+let g:indent_guides_enable_on_vim_startup = 1
+" }
 
-        " To specify a different directory in which to place the vimbackup,
-        " vimviews, vimundo, and vimswap files/directories, add the following to
-        " your .vimrc.local file:
-        "   let g:spf13_consolidated_directory = <full path to desired directory>
-        "   eg: let g:spf13_consolidated_directory = $HOME . '/.vim/'
-        if exists('g:spf13_consolidated_directory')
-            let common_dir = g:spf13_consolidated_directory . prefix
-        else
-            let common_dir = parent . '/.' . prefix
-        endif
+" Initialize directories {
+function! InitializeDirectories()
+  let parent = $HOME
+  let prefix = 'vim'
+  let dir_list = {
+        \ 'backup': 'backupdir',
+        \ 'views': 'viewdir',
+        \ 'swap': 'directory' }
 
-        for [dirname, settingname] in items(dir_list)
-            let directory = common_dir . dirname . '/'
-            if exists("*mkdir")
-                if !isdirectory(directory)
-                    call mkdir(directory)
-                endif
-            endif
-            if !isdirectory(directory)
-                echo "Warning: Unable to create backup directory: " . directory
-                echo "Try: mkdir -p " . directory
-            else
-                let directory = substitute(directory, " ", "\\\\ ", "g")
-                exec "set " . settingname . "=" . directory
-            endif
-        endfor
-    endfunction
-    " }
+  if has('persistent_undo')
+    let dir_list['undo'] = 'undodir'
+  endif
 
+  " To specify a different directory in which to place the vimbackup,
+  " vimviews, vimundo, and vimswap files/directories, add the following to
+  " your .vimrc.local file:
+  "   let g:spf13_consolidated_directory = <full path to desired directory>
+  "   eg: let g:spf13_consolidated_directory = $HOME . '/.vim/'
+  if exists('g:spf13_consolidated_directory')
+    let common_dir = g:spf13_consolidated_directory . prefix
+  else
+    let common_dir = parent . '/.' . prefix
+  endif
 
+  for [dirname, settingname] in items(dir_list)
+    let directory = common_dir . dirname . '/'
+    if exists("*mkdir")
+      if !isdirectory(directory)
+        call mkdir(directory)
+      endif
+    endif
+    if !isdirectory(directory)
+      echo "Warning: Unable to create backup directory: " . directory
+      echo "Try: mkdir -p " . directory
+    else
+      let directory = substitute(directory, " ", "\\\\ ", "g")
+      exec "set " . settingname . "=" . directory
+    endif
+  endfor
+endfunction
+" }
+
+"Search settings
+set incsearch                   " Find as you type search
+set hlsearch                    " Highlight search terms
+" Toggle search highlighting
+nmap <silent> <leader>/ :set invhlsearch<CR>
 
 set backspace=indent,eol,start  " Backspace for dummies
 set linespace=0                 " No extra spaces between rows
 set nu                          " Line numbers on
 set showmatch                   " Show matching brackets/parenthesis
-set incsearch                   " Find as you type search
-set hlsearch                    " Highlight search terms
 set ignorecase                  " Case insensitive search
 set smartcase                   " Case sensitive when uc present
 set scrolljump=5                " Lines to scroll when cursor leaves screen
@@ -121,23 +126,47 @@ set softtabstop=2               " Let backspace delete indent
 " Remove trailing whitespaces and ^M chars
 autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 
-let mapleader = ','
+"move panes with C + vimkey
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
-map <C-J> <C-W>j<C-W>_
-map <C-K> <C-W>k<C-W>_
-map <C-L> <C-W>l<C-W>_
-map <C-H> <C-W>h<C-W>_
+"Not sure what this does yet
+"map <C-J> <C-W>j<C-W>_
+"map <C-K> <C-W>k<C-W>_
+"map <C-L> <C-W>l<C-W>_
+"map <C-H> <C-W>h<C-W>_
 
-"Move tabs using Ctrl + h or Ctrl + l"
-"map <C-H> :execute "tabmove" tabpagenr() - 2 <CR>
-"map <C-L> :execute "tabmove" tabpagenr() <CR>
-"
+map <silent> <C-t>n :tabe<CR>
+
+"sizing using m for maximize n for maximize down
+map <silent> <C-w>m :tabedit %<CR>
+map <silent> <C-n> :bn<CR>
+map <silent> <C-m> :bp<CR>
+
+" Enable the list of buffers
+let g:airline#extensions#tabline#enabled = 1
+
+" Show just the filename
+let g:airline#extensions#tabline#fnamemod = ':t'
+
+
+"create splits using C+w+- and C+w+|
+map <silent> <C-w>- :sp<CR>
+map <silent> <C-w>\| :vsp<CR>
+
+"Move tabs using Ctrl + h or Ctrl + l
+map <silent> <C-w>h :execute "tabmove" tabpagenr() - 2 <CR>
+map <silent> <C-w>l :execute "tabmove" tabpagenr() <CR>
+
 " Wrapped lines goes down/up to next row, rather than next line in file.
 noremap j gj
 noremap k gk
 
-map <S-H> gT
-map <S-L> gt
+" Move windows using shift + h or shift + l
+map H gT
+map L gt
 
 " Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
@@ -154,9 +183,6 @@ nmap <leader>f7 :set foldlevel=7<CR>
 nmap <leader>f8 :set foldlevel=8<CR>
 nmap <leader>f9 :set foldlevel=9<CR>
 
-" Toggle search highlighting
-nmap <silent> <leader>/ :set invhlsearch<CR>
-
 " Visual shifting (does not exit Visual mode)
 vnoremap < <gv
 vnoremap > >gv
@@ -168,39 +194,32 @@ imap [F $
 map [H g0
 imap [H g0
 
-" Easier horizontal scrolling
-map zl zL
-map zh zH
-    " Fugitive {
-        nnoremap <silent> <leader>gs :Gstatus<CR>
-        nnoremap <silent> <leader>gd :Gdiff<CR>
-        nnoremap <silent> <leader>gc :Gcommit<CR>
-        nnoremap <silent> <leader>gb :Gblame<CR>
-        nnoremap <silent> <leader>gl :Glog<CR>
-        nnoremap <silent> <leader>gp :Git push<CR>
-        nnoremap <silent> <leader>gw :Gwrite<CR>:GitGutter<CR>
-        nnoremap <silent> <leader>gg :GitGutterToggle<CR>
-    "}
-    "
-        if &term == 'xterm' || &term == 'screen'
-            set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
-        endif
+" Fugitive {
+nnoremap <silent> <leader>gs :Gstatus<CR>
+nnoremap <silent> <leader>gd :Gdiff<CR>
+nnoremap <silent> <leader>gc :Gcommit<CR>
+nnoremap <silent> <leader>gb :Gblame<CR>
+nnoremap <silent> <leader>gl :Glog<CR>
+nnoremap <silent> <leader>gp :Git push<CR>
+nnoremap <silent> <leader>gw :Gwrite<CR>:GitGutter<CR>
+nnoremap <silent> <leader>gg :GitGutterToggle<CR>
+"}
 
-    " NerdTree {
-        map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
-        map <leader>e :NERDTreeFind<CR>
-        nmap <leader>nt :NERDTreeFind<CR>
+" NerdTree {
+map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
+map <leader>e :NERDTreeFind<CR>
+nmap <leader>nt :NERDTreeFind<CR>
 
-        let NERDTreeShowBookmarks=1
-        let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
-        let NERDTreeChDirMode=0
-        let NERDTreeQuitOnOpen=1
-        let NERDTreeMouseMode=2
-        let NERDTreeShowHidden=1
-        let NERDTreeKeepTreeInNewTab=1
-        let g:nerdtree_tabs_open_on_gui_startup=0
-    " }
+let NERDTreeShowBookmarks=1
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeChDirMode=0
+let NERDTreeQuitOnOpen=1
+let NERDTreeShowHidden=1
+let NERDTreeKeepTreeInNewTab=1
+let g:nerdtree_tabs_open_on_gui_startup=0
+" }
 
+"fix typos with e/w/q/a
 if has("user_commands")
   command! -bang -nargs=* -complete=file E e<bang> <args>
   command! -bang -nargs=* -complete=file W w<bang> <args>
@@ -213,42 +232,41 @@ if has("user_commands")
   command! -bang Qa qa<bang>
 endif
 
-    highlight clear SignColumn      " SignColumn should match background for
-                                    " things like vim-gitgutter
+"fix SignColumn for vim-gitgutter
+highlight clear SignColumn
 
-cmap Tabe tabe
-
-    " Strip whitespace {
-    function! StripTrailingWhitespace()
-        " To disable the stripping of whitespace, add the following to your
-        " .vimrc.local file:
-        "   let g:spf13_keep_trailing_whitespace = 1
-        if !exists('g:spf13_keep_trailing_whitespace')
-            " Preparation: save last search, and cursor position.
-            let _s=@/
-            let l = line(".")
-            let c = col(".")
-            " do the business:
-            %s/\s\+$//e
-            " clean up: restore previous search history, and cursor position
-            let @/=_s
-            call cursor(l, c)
-        endif
-    endfunction
-    " }
-
+" Strip whitespace {
+function! StripTrailingWhitespace()
+  " Preparation: save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  " do the business:
+  %s/\s\+$//e
+  " clean up: restore previous search history, and cursor position
+  let @/=_s
+  call cursor(l, c)
+endfunction
+" }
 
 "Map leadery/p to use system clipboard
 map <leader>y "+y
 map <leader>p "+p
 
-    set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
+" Toggle paste mode via Ctrl + Shift + P
+set pastetoggle=<F12>
 
-"this will take getting used to
+"bind kj to Esc in insert or select mode
 inoremap kj <Esc>
 "vnoremap kj <Esc>
-"noremap pp p
-"nmap pw viwpp
-"nmap py Vpp
 
-    call InitializeDirectories()
+"key bindings for replace line and replace word
+noremap rw vep
+noremap ry Vp
+
+" Easier horizontal scrolling
+map zl zL
+map zh zH
+
+"create the .vimbak .vimswap .vimhist directories
+call InitializeDirectories()

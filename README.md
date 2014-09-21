@@ -11,6 +11,8 @@ TODO:
 * this looks cool https://github.com/christoomey/vim-tmux-navigator
 * start using panes and buffers for vim
 * learn how to use fugitive
+* add gitconfig
+* git log --decorate --all --oneline --graph
 
 Some plugins to add:
 * vim-view maybe
