@@ -9,6 +9,9 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
+#vim is the best
+EDITOR="vim"
+
 #TODO: add git bindings
 #aliases
 alias reload-zshrc='source ~/.zshrc'

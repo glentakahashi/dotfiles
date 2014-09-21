@@ -268,5 +268,8 @@ noremap ry Vp
 map zl zL
 map zh zH
 
+" easy replace under word
+nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()
