@@ -2,6 +2,12 @@ set nocompatible
 scriptencoding utf-8
 
 let mapleader = ','
+set timeoutlen=1000 ttimeoutlen=0
+
+"easymotion shit
+map <Leader> <Plug>(easymotion-prefix)
+let g:EasyMotion_smartcase = 1
+nmap s <Plug>(easymotion-s)
 
 "Pathogen stuff
 execute pathogen#infect()
@@ -126,18 +132,7 @@ set softtabstop=2               " Let backspace delete indent
 " Remove trailing whitespaces and ^M chars
 autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 
-"move panes with C + vimkey
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
-
-"Not sure what this does yet
-"map <C-J> <C-W>j<C-W>_
-"map <C-K> <C-W>k<C-W>_
-"map <C-L> <C-W>l<C-W>_
-"map <C-H> <C-W>h<C-W>_
-
+"new tab
 map <silent> <C-t>n :tabe<CR>
 
 "sizing using m for maximize n for maximize down
@@ -186,13 +181,6 @@ nmap <leader>f9 :set foldlevel=9<CR>
 " Visual shifting (does not exit Visual mode)
 vnoremap < <gv
 vnoremap > >gv
-
-" Fix home and end keybindings for screen, particularly on mac
-" - for some reason this fixes the arrow keys too. huh.
-map [F $
-imap [F $
-map [H g0
-imap [H g0
 
 " Fugitive {
 nnoremap <silent> <leader>gs :Gstatus<CR>
@@ -255,6 +243,7 @@ map <leader>p "+p
 
 " Toggle paste mode via Ctrl + Shift + P
 set pastetoggle=<F12>
+map <leader>. :set paste!<CR>
 
 "bind kj to Esc in insert or select mode
 inoremap kj <Esc>

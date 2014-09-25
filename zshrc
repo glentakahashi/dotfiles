@@ -12,6 +12,9 @@ source $ZSH/oh-my-zsh.sh
 #vim is the best
 EDITOR="vim"
 
+# 10ms for key sequences
+KEYTIMEOUT=1
+
 #TODO: add git bindings
 #aliases
 alias reload-zshrc='source ~/.zshrc'
@@ -35,9 +38,6 @@ alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]* ?[a-zA-Z0-9]
 
 #fixes
 export TERM=xterm-256color
-
-#vimode!
-bindkey -v
 
 # load system specific overrides
 source ~/.zshrc.system
