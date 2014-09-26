@@ -1,0 +1,42 @@
+[user]
+  name = Glen Takahashi
+  email = me@glentaka.com
+
+[core]
+  editor = vim
+
+[push]
+  default = simple
+
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+  ui = auto
+
+[alias]
+  # View abbreviated SHA, description, and history graph of the latest 20 commits
+  l = log --pretty=oneline --decorate -n 20 --graph --abbrev-commit
+  la = log --pretty=oneline --decorate -n 20 --graph --abbrev-commit --all
+
+  # View the current working tree status using the short format
+  s = status -s
+  st = status
+
+  # shortcuts
+  ci = commit
+  al = add . --all
+
+  # Show the diff between the latest commit and the current state
+  d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
+
+  # `git di $number` shows the diff between the state `$number` revisions ago and the current state
+  di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
+
+  # Show verbose output about tags, branches or remotes
+  tags = tag -l
+  branches = branch -a
+  remotes = remote -v
+
+  # Amend the currently staged files to the latest commit
+  amend = commit --amend --reuse-message=HEAD
