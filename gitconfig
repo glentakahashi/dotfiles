@@ -27,6 +27,9 @@
   ci = commit
   al = add . --all
 
+  #clone one of my own repos
+  cc = !"git clone git@github.com:glentakahashi/$1"
+
   # Show the diff between the latest commit and the current state
   d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
 
