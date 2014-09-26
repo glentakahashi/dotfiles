@@ -3,16 +3,12 @@ Not guaranteed to work...
 
 Needs some powerline fonts and shit
 
-
 TODO:
 * remove dependencies on oh my zsh
 * fix neocomplcache and nerdtree and ctrlp
 * add in .profile .bash_profile and .zsh_profile
-* this looks cool https://github.com/christoomey/vim-tmux-navigator
-* start using panes and buffers for vim
+* get better buffer navigator
 * learn how to use fugitive
-* add gitconfig
-* git log --decorate --all --oneline --graph
 
 Some plugins to add:
 * vim-view maybe
