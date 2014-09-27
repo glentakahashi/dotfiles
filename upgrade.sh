@@ -8,4 +8,4 @@ cd $SCRIPTPATH
 #init and update if we haven't already
 echo Updating submodules...
 git submodule init
-git submodule update
+git submodule foreach git pull origin master
