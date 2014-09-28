@@ -9,6 +9,9 @@ map <Leader> <Plug>(easymotion-prefix)
 let g:EasyMotion_smartcase = 1
 nmap s <Plug>(easymotion-s)
 
+"allow buffers to be moved off of if they have changes
+set hidden
+
 "Pathogen stuff
 execute pathogen#infect()
 syntax on
@@ -106,8 +109,8 @@ endfunction
 "Search settings
 set incsearch                   " Find as you type search
 set hlsearch                    " Highlight search terms
-" Toggle search highlighting
-nmap <silent> <leader>/ :set invhlsearch<CR>
+"clear search highlighting
+nmap <silent> <leader>/ :noh<CR>
 
 set backspace=indent,eol,start  " Backspace for dummies
 set linespace=0                 " No extra spaces between rows
@@ -122,9 +125,10 @@ set wildmode=list:longest,full  " Command <Tab> completion, list matches, then l
 set list
 set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
 
-set nowrap                      " Wrap long lines
+set nowrap                      " Don't wrap long lines
 set autoindent                  " Indent at the same level of the previous line
-set shiftwidth=2                " Use indents of 4 spaces
+"todo, make this dependent on file
+set shiftwidth=2                " Use indents of 2 spaces
 set expandtab                   " Tabs are spaces, not tabs
 set tabstop=2                   " An indentation every four columns
 set softtabstop=2               " Let backspace delete indent
