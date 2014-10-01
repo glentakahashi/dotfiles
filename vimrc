@@ -12,6 +12,9 @@ nmap s <Plug>(easymotion-s)
 "allow buffers to be moved off of if they have changes
 set hidden
 
+"easily close buffer without closing window
+map <leader>d :Bclose<CR>
+
 "Pathogen stuff
 execute pathogen#infect()
 syntax on
@@ -135,12 +138,13 @@ set softtabstop=2               " Let backspace delete indent
 
 " Remove trailing whitespaces and ^M chars
 autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+map <leader>c :call StripTrailingWhitespace()<CR>
 
 "new tab
-map <silent> <C-t>n :tabe<CR>
+"map <silent> <C-t>n :tabe<CR>
 
 "sizing using m for maximize n for maximize down
-map <silent> <C-w>m :tabedit %<CR>
+"map <silent> <C-w>m :tabedit %<CR>
 map <silent> <C-n> :bn<CR>
 map <silent> <C-m> :bp<CR>
 
@@ -155,6 +159,7 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 map <silent> <C-w>- :sp<CR>
 map <silent> <C-w>\| :vsp<CR>
 
+"TODO: make into buffermove
 "Move tabs using Ctrl + h or Ctrl + l
 map <silent> <C-w>h :execute "tabmove" tabpagenr() - 2 <CR>
 map <silent> <C-w>l :execute "tabmove" tabpagenr() <CR>

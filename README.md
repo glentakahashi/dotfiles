@@ -11,6 +11,8 @@ TODO:
 * add in .profile .bash_profile and .zsh_profile
 * get better buffer navigator
 * learn how to use fugitive
+* make it a ton better to use nested tmux commands. I think it would be good to use Ctrl+a x2 to switch contexts between tmux sessions
+* make a new alias for easycd to go in reverse order
 
 Some plugins to add:
 * vim-view maybe
