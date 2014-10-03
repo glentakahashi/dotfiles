@@ -161,8 +161,8 @@ map <silent> <C-w>\| :vsp<CR>
 
 "TODO: make into buffermove
 "Move tabs using Ctrl + h or Ctrl + l
-map <silent> <C-w>h :execute "tabmove" tabpagenr() - 2 <CR>
-map <silent> <C-w>l :execute "tabmove" tabpagenr() <CR>
+"map <silent> <C-w>h :execute "tabmove" tabpagenr() - 2 <CR>
+"map <silent> <C-w>l :execute "tabmove" tabpagenr() <CR>
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
 noremap j gj
@@ -268,6 +268,12 @@ map zh zH
 
 " easy replace under word
 nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+
+" Resizing windows
+map <silent> <C-w>k :res +5<CR>
+map <silent> <C-w>j :res -5<CR>
+map <silent> <C-w>h :vertical resize -5<CR>
+map <silent> <C-w>l :vertical resize +5<CR>
 
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()
