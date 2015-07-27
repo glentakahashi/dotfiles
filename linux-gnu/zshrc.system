@@ -3,5 +3,29 @@
 #dircolors
 test -e ~/.dircolors && eval `dircolors -b ~/.dircolors`
 
+#del to move stuff to trash
+alias trash="gvfs-trash"
+alias del="trash"
+
 export PATH=/usr/local/bin/:/usr/bin/:~/bin/:/usr/local/lib64/:$PATH
-export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-amd64/jre
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+#simple proxy through ssh
+socks() {
+  if [[ -z $1 ]]; then
+    echo "Enter a place to proxy to."
+    return 1;
+  fi
+  #if a socks proxy already exists
+  if [[ -e "/tmp/socks.sock" ]]; then
+    unsocks
+  fi
+  ssh -4 -nNfM -S /tmp/socks.sock -D 1337 $1 2> /dev/null
+  gsettings set org.gnome.system.proxy mode "manual"
+}
+
+unsocks() {
+  gsettings set org.gnome.system.proxy mode "none"
+  ssh -S /tmp/socks.sock -O exit asdf
+}
+

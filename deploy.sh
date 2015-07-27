@@ -43,6 +43,8 @@ function backupIfNotSymlink() {
     fi
 }
 
+#TODO, just create a mappings array to install
+
 #remove symlinks if they exist or backup file
 backupIfNotSymlink ~/.tmux.conf
 backupIfNotSymlink ~/.tmux.reset.conf
@@ -65,7 +67,10 @@ ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
 ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s $SCRIPTPATH/dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 ln -v -s $SCRIPTPATH/zsh ~/.zsh
-ln -v -s $SCRIPTPATH/gitconfig ~/.gitconfig
+ln -v -s $SCRIPTPATH/template.html ~/.template.html
+#ln -v -s $SCRIPTPATH/gitconfig ~/.gitconfig
+#COPY GITCONFIG BECAUSE IF ITS BROKEN ITS ANNOYING TO MERGE
+cp -v $SCRIPTPATH/gitconfig ~/.gitconfig
 
 #these two files depend upon system type
 ln -s $SCRIPTPATH/$SYSTEM/tmux.system.conf ~/.tmux.system.conf

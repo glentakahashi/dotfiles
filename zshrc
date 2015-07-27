@@ -1,3 +1,4 @@
+source /etc/profile
 ADDONS=$HOME/.zsh
 
 # oh-my-zsh options
@@ -35,10 +36,26 @@ alias gg='easyGrepOpen'
 #most common commands - useful for determining what else i should alias to save time
 alias mosthist="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
 alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]* ?[a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
-alias cl='clear'
+
+#commonslyusedstuff
+alias lsr='ls -lahtr'
+alias dust='du -hs * | sort -h'
+
+#create a basic html file
+html() {
+  if [[ -z $1 ]]; then
+    echo "Enter a path to create a basic html file at."
+    return 1;
+  fi
+  cp ~/.template.html $1
+}
 
 #fixes
 export TERM=xterm-256color
+
+#go stuff
+export GOPATH=~/go
+export PATH=$GOPATH/bin:$PATH
 
 # load system specific overrides
 source ~/.zshrc.system

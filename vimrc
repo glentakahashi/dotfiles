@@ -14,6 +14,7 @@ set hidden
 
 "easily close buffer without closing window
 map <leader>d :Bclose<CR>
+map <leader>D :Bclose!<CR>
 
 "Pathogen stuff
 execute pathogen#infect()
@@ -138,15 +139,16 @@ set softtabstop=2               " Let backspace delete indent
 
 " Remove trailing whitespaces and ^M chars
 autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown
 map <leader>c :call StripTrailingWhitespace()<CR>
 
 "new tab
 "map <silent> <C-t>n :tabe<CR>
 
-"sizing using m for maximize n for maximize down
-"map <silent> <C-w>m :tabedit %<CR>
-map <silent> <C-n> :bn<CR>
-map <silent> <C-m> :bp<CR>
+" open window in a new tab instead
+"map <silent> <C-w>t :tabedit %<CR> TODO:
+nnoremap <silent> <C-n> :bn<CR>
+nnoremap <silent> <C-i> :bp<CR>
 
 " Enable the list of buffers
 let g:airline#extensions#tabline#enabled = 1
@@ -275,5 +277,17 @@ map <silent> <C-w>j :res -5<CR>
 map <silent> <C-w>h :vertical resize -5<CR>
 map <silent> <C-w>l :vertical resize +5<CR>
 
+" top/bottom/middle jump
+"nmap gk 
+"nmap gm 
+"nmap gj 
+
+" right left
+"nmap gh 
+"nmap gl 
+
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()
+
+"load localvimrc
+source ~/.vimrc.local
