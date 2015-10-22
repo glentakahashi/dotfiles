@@ -171,8 +171,8 @@ noremap j gj
 noremap k gk
 
 " Move windows using shift + h or shift + l
-map H gT
-map L gt
+"map H gT
+"map L gt
 
 " Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
@@ -278,13 +278,13 @@ map <silent> <C-w>h :vertical resize -5<CR>
 map <silent> <C-w>l :vertical resize +5<CR>
 
 " top/bottom/middle jump
-"nmap gk 
-"nmap gm 
-"nmap gj 
+map gk H
+map gm M
+map gj L
 
 " right left
-"nmap gh 
-"nmap gl 
+map gl g$
+map gh g0
 
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()

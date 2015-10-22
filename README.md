@@ -7,6 +7,8 @@ I (think) it depends on solarized colorscheme and powerline fonts in your termin
 
 TODO:
 
+* on your servers, use ctrl+s or ctrl+b instead of ctrl+a so there is no overlap
+
 * Make environment/zsh/bashrc/profile all consistent
 * multiple tmux sessions, selector (windows)
 * use windows as different workspaces, sessions as different projects
@@ -27,3 +29,5 @@ TODO:
 
 Some plugins to add:
 * vim-view maybe
+http://vimcasts.org/episodes/aligning-text-with-tabular-vim/
+vim-csv
