@@ -1,6 +1,9 @@
 set nocompatible
 scriptencoding utf-8
 
+" Required Vundle setup
+source ~/projects/dotfiles/vimrc.vundle
+
 let mapleader = ','
 set timeoutlen=1000 ttimeoutlen=0
 
@@ -16,10 +19,7 @@ set hidden
 map <leader>d :Bclose<CR>
 map <leader>D :Bclose!<CR>
 
-"Pathogen stuff
-execute pathogen#infect()
 syntax on
-filetype plugin indent on
 
 set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility

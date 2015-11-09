@@ -53,6 +53,7 @@ backupIfNotSymlink ~/.tmux.system.conf
 backupIfNotSymlink ~/.zshrc
 backupIfNotSymlink ~/.zshrc.system
 backupIfNotSymlink ~/.vimrc
+backupIfNotSymlink ~/.vimrc.vundle
 backupIfNotSymlink ~/.dircolors
 backupIfNotSymlink ~/.gitconfig
 rm -rf ~/.vim.bak
@@ -64,6 +65,7 @@ ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf
 ln -v -s $SCRIPTPATH/tmux.reset.conf ~/.tmux.reset.conf
 ln -v -s $SCRIPTPATH/tmux-colors-solarized/tmuxcolors-256.conf ~/.tmux.colors.conf
 ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
+ln -v -s $SCRIPTPATH/vimrc.vundle ~/.vimrc.vundle
 ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s $SCRIPTPATH/dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 ln -v -s $SCRIPTPATH/zsh ~/.zsh
@@ -80,11 +82,3 @@ ln -s $SCRIPTPATH/$SYSTEM/zshrc.system ~/.zshrc.system
 touch ~/.tmux.local.conf
 touch ~/.zshrc.local
 touch ~/.vimrc.local
-
-#install bundles
-echo Creating .vim/autoload and .vim/bundle
-mkdir -p ~/.vim
-rm -f ~/.vim/autoload
-rm -f ~/.vim/bundle
-ln -v -s $SCRIPTPATH/vim/vim-pathogen/autoload ~/.vim/autoload
-ln -v -s $SCRIPTPATH/vim/bundle ~/.vim/bundle

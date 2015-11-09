@@ -7,7 +7,7 @@ I (think) it depends on solarized colorscheme and powerline fonts in your termin
 
 TODO:
 
-* on your servers, use ctrl+s or ctrl+b instead of ctrl+a so there is no overlap
+* Vundle
 
 * Make environment/zsh/bashrc/profile all consistent
 * multiple tmux sessions, selector (windows)
@@ -18,11 +18,10 @@ TODO:
 * add in .profile .bash_profile and .zsh_profile
 * get better buffer navigator
 * learn how to use fugitive
-* make it a ton better to use nested tmux commands. I think it would be good to use Ctrl+a x2 to switch contexts between tmux sessions
 * make a new alias for easycd to go in reverse order
-* add sshconfig in maybe??? (definitely insecure)
+  * add sshconfig in maybe??? (definitely insecure)
 * make deploy script fail unless you are me! (i suggest people don't run it naked)
-* switch to pathogen instead of whatever i have now
+  * or ask questions and make a better spf13
 * folding and shit
 * move buffers around (ctrl+p for buffers or something)
 * SURROUND

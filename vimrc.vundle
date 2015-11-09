@@ -1,0 +1,39 @@
+" set the runtime path to include Vundle and initialize
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+
+Plugin 'amirh/HTML-AutoCloseTag'
+Plugin 'rbgrouleff/bclose.vim'
+Plugin 'Shougo/neocomplcache.vim'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'scrooloose/nerdtree'
+Plugin 'myusuf3/numbers.vim'
+Plugin 'scrooloose/syntastic'
+Plugin 'bling/vim-airline'
+Plugin 'bling/vim-bufferline'
+Plugin 'altercation/vim-colors-solarized'
+
+"git stuff
+
+"file navigation
+Plugin 'christoomey/vim-tmux-navigator'
+
+Plugin 'hail2u/vim-css3-syntax'
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'tpope/vim-fugitive'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'kien/ctrlp.vim'
+
+"Languages
+Plugin 'leafgarland/typescript-vim'
+Plugin 'mustache/vim-mustache-handlebars'
+Plugin 'elzr/vim-json'
+Plugin 'groenewege/vim-less'
+Plugin 'kchmck/vim-coffee-script'
+
+call vundle#end()            " required
+filetype plugin indent on    " required
