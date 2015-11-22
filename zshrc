@@ -1,14 +1,13 @@
 source /etc/profile
-ADDONS=$HOME/.zsh
 
 # oh-my-zsh options
-ZSH=$ADDONS/oh-my-zsh
+ZSH=~/.oh-my-zsh
 ZSH_THEME="agnoster"
 DISABLE_AUTO_UPDATE="true"
 DISABLE_CORRECTION="true"
 DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(git)
-source $ZSH/oh-my-zsh.sh
+source ~/.oh-my-zsh/oh-my-zsh.sh
 
 #vim is the best
 EDITOR="vim"
@@ -23,14 +22,14 @@ alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
 #easycd
-source $ADDONS/fs-easymotion/easycd.sh
+source ~/.fs-easymotion/easycd.sh
 alias u='easyCdUp'
 #easyfind
-source $ADDONS/fs-easymotion/easyfind.sh
+source ~/.fs-easymotion/easyfind.sh
 alias f='easyFind'
 alias ff='easyFindOpen'
 #easygrep
-source $ADDONS/fs-easymotion/easygrep.sh
+source ~/.fs-easymotion/easygrep.sh
 alias g='easyGrep'
 alias gg='easyGrepOpen'
 #most common commands - useful for determining what else i should alias to save time
