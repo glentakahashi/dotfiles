@@ -1,0 +1,6 @@
+fvim() {
+  local files file
+  files=$(ag -p ~/.agignore -g "") &&
+  file=$(echo "$files" | fzf-tmux) &&
+  vim $file
+}

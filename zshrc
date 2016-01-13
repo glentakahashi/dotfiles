@@ -26,11 +26,9 @@ source ~/.fs-easymotion/easycd.sh
 alias u='easyCdUp'
 #easyfind
 source ~/.fs-easymotion/easyfind.sh
-alias f='easyFind'
 alias ff='easyFindOpen'
 #easygrep
 source ~/.fs-easymotion/easygrep.sh
-alias g='easyGrep'
 alias gg='easyGrepOpen'
 #most common commands - useful for determining what else i should alias to save time
 alias mosthist="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
@@ -56,8 +54,13 @@ export TERM=xterm-256color
 export GOPATH=~/go
 export PATH=$GOPATH/bin:$PATH
 
+#fzf aliases
+#source ~/.zshrc.fzf
+
 # load system specific overrides
 source ~/.zshrc.system
 
 # load local overrides
 source ~/.zshrc.local
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

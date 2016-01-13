@@ -1,8 +1,7 @@
 set nocompatible
 scriptencoding utf-8
 
-" Required Vundle setup
-source ~/projects/dotfiles/vimrc.vundle
+source ~/.vimplug
 
 let mapleader = ','
 set timeoutlen=1000 ttimeoutlen=0
@@ -35,6 +34,8 @@ if has('persistent_undo')
   set undoreload=10000        " Maximum number lines to save for undo on a buffer reload
 endif
 
+inoremap <C-j> <Down>
+inoremap <C-k> <Up>
 
 if &term == 'xterm' || &term == 'screen'
   set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
@@ -46,6 +47,7 @@ set tabpagemax=15               " Only show 15 tabs
 set showmode                    " Display the current mode
 set cursorline                  " Highlight current line
 
+"TODO: this doesn't work
 if has('statusline')
   set laststatus=2
 
@@ -67,6 +69,8 @@ let g:indent_guides_start_level = 2
 let g:indent_guides_guide_size = 1
 let g:indent_guides_enable_on_vim_startup = 1
 " }
+
+let g:neocomplete#enable_at_startup = 1
 
 " Initialize directories {
 function! InitializeDirectories()
@@ -114,7 +118,8 @@ endfunction
 set incsearch                   " Find as you type search
 set hlsearch                    " Highlight search terms
 "clear search highlighting
-nmap <silent> <leader>/ :noh<CR>
+"not necessary anymore becauase of oblique
+"nmap <silent> <leader>/ :noh<CR>
 
 set backspace=indent,eol,start  " Backspace for dummies
 set linespace=0                 " No extra spaces between rows
@@ -145,9 +150,26 @@ map <leader>c :call StripTrailingWhitespace()<CR>
 "new tab
 "map <silent> <C-t>n :tabe<CR>
 
+let g:multi_cursor_exit_from_visual_mode = 0
+"let g:multi_cursor_exit_from_insert_mode = 0
+
+" Called once right before you start selecting multiple cursors
+function! Multiple_cursors_before()
+  if exists(':NeoCompleteLock')==2
+    exe 'NeoCompleteLock'
+  endif
+endfunction
+
+" Called once only when the multiple selection is canceled (default <Esc>)
+function! Multiple_cursors_after()
+  if exists(':NeoCompleteUnlock')==2
+    exe 'NeoCompleteUnlock'
+  endif
+endfunction
+
 " open window in a new tab instead
 "map <silent> <C-w>t :tabedit %<CR> TODO:
-nnoremap <silent> <C-n> :bn<CR>
+nnoremap <silent> <C-o> :bn<CR>
 nnoremap <silent> <C-i> :bp<CR>
 
 " Enable the list of buffers
@@ -165,6 +187,24 @@ map <silent> <C-w>\| :vsp<CR>
 "Move tabs using Ctrl + h or Ctrl + l
 "map <silent> <C-w>h :execute "tabmove" tabpagenr() - 2 <CR>
 "map <silent> <C-w>l :execute "tabmove" tabpagenr() <CR>
+
+""""" FZF stuff """""
+"TODO: make this work...
+nnoremap <silent> <C-p> :FZF -m<CR>
+command! FZFMru call fzf#run({
+\ 'source':  reverse(s:all_files()),
+\ 'sink':    'edit',
+\ 'options': '-m -x +s',
+\ 'down':    '40%' })
+
+function! s:all_files()
+  return extend(
+  \ filter(copy(v:oldfiles),
+  \        "v:val !~ 'fugitive:\\|NERD_tree\\|^/tmp/\\|.git/'"),
+  \ map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), 'bufname(v:val)'))
+endfunction
+
+nnoremap <silent> <C-m> :FZFMru <CR>
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
 noremap j gj
@@ -249,8 +289,8 @@ endfunction
 " }
 
 "Map leadery/p to use system clipboard
-map <leader>y "+y
-map <leader>p "+p
+noremap <leader>y "+y
+noremap <leader>p "+p
 
 " Toggle paste mode via Ctrl + Shift + P
 set pastetoggle=<F12>

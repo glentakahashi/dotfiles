@@ -47,7 +47,7 @@ backupIfNotSymlink ~/.tmux.system.conf
 backupIfNotSymlink ~/.zshrc
 backupIfNotSymlink ~/.zshrc.system
 backupIfNotSymlink ~/.vimrc
-backupIfNotSymlink ~/.vimrc.vundle
+backupIfNotSymlink ~/.vimplug
 backupIfNotSymlink ~/.dircolors
 backupIfNotSymlink ~/.gitconfig
 rm -rf ~/.vim.bak
@@ -58,15 +58,14 @@ git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarize
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
 git clone https://github.com/glentakahashi/fs-easymotion ~/.fs-easymotion
 git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
-mkdir -p ~/.vim/bundle
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 #make the new symlinks
 ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf
 ln -v -s $SCRIPTPATH/tmux.reset.conf ~/.tmux.reset.conf
 ln -v -s ~/.tmux-colors-solarized/tmuxcolors-256.conf ~/.tmux.colors.conf
 ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
-ln -v -s $SCRIPTPATH/vimrc.vundle ~/.vimrc.vundle
+ln -v -s $SCRIPTPATH/vimplug ~/.vimplug
 ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s ~/.dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 ln -v -s $SCRIPTPATH/template.html ~/.template.html

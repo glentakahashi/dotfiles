@@ -25,8 +25,35 @@ TODO:
 * folding and shit
 * move buffers around (ctrl+p for buffers or something)
 * SURROUND
+* Split vimrc into mutliple files based on plugin they're for?
 
 Some plugins to add:
 * vim-view maybe
 http://vimcasts.org/episodes/aligning-text-with-tabular-vim/
 vim-csv
+https://github.com/junegunn/vim-easy-align
+https://github.com/junegunn/vim-peekaboo
+https://github.com/junegunn/vim-fnr
+https://github.com/junegunn/mvmv
+seoul256.vim 
+
+make sure you install vim with --with-lua
+brew install vim --with-lua
+
+
+## vimplug
+
+vim-oblique overrides the following keys by default:
+
+| Default Key | `<Plug>` map           | Description                                      |
+| ----------- | -------------------- | ------------------------------------------------ |
+| `/`         | `<Plug>(Oblique-/)`  | Forward search                                   |
+| `?`         | `<Plug>(Oblique-?)`  | Backward search                                  |
+| `z/`        | `<Plug>(Oblique-F/)` | Forward fuzzy-search                             |
+| `z?`        | `<Plug>(Oblique-F?)` | Backward fuzzy-search                            |
+| `n`         | `<Plug>(Oblique-n)`  | Repeat the last search                           |
+| `N`         | `<Plug>(Oblique-N)`  | Repeat the last search in the opposite direction |
+| `*`         | `<Plug>(Oblique-*)`  | Forward star-search (in normal and visual mode)  |
+| `#`         | `<Plug>(Oblique-#)`  | Backward star-search (in normal and visual mode) |
+| `g*`        | `<Plug>(Oblique-g*)` | Forward star-search (no word boundary match)     |
+| `g#`        | `<Plug>(Oblique-g#)` | Backward star-search (no word boundary match)    |
