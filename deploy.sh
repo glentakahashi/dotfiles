@@ -46,6 +46,7 @@ backupIfNotSymlink ~/.tmux.colors.conf
 backupIfNotSymlink ~/.tmux.system.conf
 backupIfNotSymlink ~/.zshrc
 backupIfNotSymlink ~/.zshrc.system
+backupIfNotSymlink ~/.zshrc.fzf
 backupIfNotSymlink ~/.vimrc
 backupIfNotSymlink ~/.vimplug
 backupIfNotSymlink ~/.dircolors
@@ -67,6 +68,7 @@ ln -v -s ~/.tmux-colors-solarized/tmuxcolors-256.conf ~/.tmux.colors.conf
 ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
 ln -v -s $SCRIPTPATH/vimplug ~/.vimplug
 ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
+ln -v -s $SCRIPTPATH/zshrc.fzf ~/.zshrc.fzf
 ln -v -s ~/.dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 ln -v -s $SCRIPTPATH/template.html ~/.template.html
 #ln -v -s $SCRIPTPATH/gitconfig ~/.gitconfig

@@ -35,6 +35,7 @@ https://github.com/junegunn/vim-easy-align
 https://github.com/junegunn/vim-peekaboo
 https://github.com/junegunn/vim-fnr
 https://github.com/junegunn/mvmv
+#add gem scripts
 seoul256.vim 
 
 make sure you install vim with --with-lua

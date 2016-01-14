@@ -4,3 +4,19 @@ fvim() {
   file=$(echo "$files" | fzf-tmux) &&
   vim $file
 }
+
+# fu - cd to selected parent directory
+fu() {
+  local declare dirs=()
+  get_parent_dirs() {
+    dirs+=("$1")
+    if [[ ${1} == '/' ]]; then
+      for _dir in ${dirs[@]}; do
+        echo $_dir
+      done
+    else
+      get_parent_dirs $(dirname $1)
+    fi
+  }
+  DIR=$(get_parent_dirs ${1:-$(pwd)} | fzf-tmux --tac) && cd "$DIR"
+}

@@ -48,14 +48,14 @@ html() {
 }
 
 #fixes
-export TERM=xterm-256color
+#export TERM=screen-256color
 
 #go stuff
 export GOPATH=~/go
 export PATH=$GOPATH/bin:$PATH
 
 #fzf aliases
-#source ~/.zshrc.fzf
+source ~/.zshrc.fzf
 
 # load system specific overrides
 source ~/.zshrc.system
