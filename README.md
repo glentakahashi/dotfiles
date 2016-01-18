@@ -10,7 +10,8 @@ TODO:
 * Make environment/zsh/bashrc/profile all consistent
 * multiple tmux sessions, selector (windows)
 * use windows as different workspaces, sessions as different projects
-* add fugitive to numbers_exclude
+* add fugitive, syntastic to numbers_exclude
+* fix weird loclist issues with syntastic
 
 * remove dependencies on oh my zsh
 * add in .profile .bash_profile and .zsh_profile
