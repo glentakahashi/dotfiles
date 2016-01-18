@@ -21,12 +21,6 @@ alias reload-zshrc='source ~/.zshrc'
 alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
-#easycd
-source ~/.fs-easymotion/easycd.sh
-alias u='easyCdUp'
-#easyfind
-source ~/.fs-easymotion/easyfind.sh
-alias ff='easyFindOpen'
 #easygrep
 source ~/.fs-easymotion/easygrep.sh
 alias gg='easyGrepOpen'
