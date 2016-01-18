@@ -58,7 +58,7 @@ backupIfNotSymlink ~/.zsh
 git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarized
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
 git clone https://github.com/glentakahashi/fs-easymotion ~/.fs-easymotion
-git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 #make the new symlinks
