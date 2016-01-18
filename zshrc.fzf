@@ -20,3 +20,20 @@ fu() {
   }
   DIR=$(get_parent_dirs ${1:-$(pwd)} | fzf-tmux --tac) && cd "$DIR"
 }
+
+fzf-easy-grep() {
+  last-arg() {
+    print "${@[-1]}"
+  }
+  local string="$(eval "last-arg $LBUFFER")"
+  local line=$(grep -riI --exclude-dir ".git" --color=never "$string" . | fzf-tmux)
+  if [[ -n $line ]]; then
+    local index=$(expr index "$line" ":")
+    local file=${line:0:($index-1)}
+    LBUFFER="${LBUFFER:0:(${#LBUFFER}-${#string})}${file}"
+    zle redisplay
+  fi
+}
+
+zle     -N   fzf-easy-grep
+bindkey '^G' fzf-easy-grep

@@ -21,9 +21,6 @@ alias reload-zshrc='source ~/.zshrc'
 alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
-#easygrep
-source ~/.fs-easymotion/easygrep.sh
-alias gg='easyGrepOpen'
 #most common commands - useful for determining what else i should alias to save time
 alias mosthist="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
 alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]* ?[a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
