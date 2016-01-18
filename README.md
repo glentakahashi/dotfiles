@@ -31,6 +31,7 @@ https://github.com/junegunn/vim-easy-align
 https://github.com/junegunn/vim-peekaboo
 https://github.com/junegunn/vim-fnr
 https://github.com/junegunn/mvmv
+https://github.com/ggVGc/fzf_browser
 #add gem scripts
 seoul256.vim 
 
