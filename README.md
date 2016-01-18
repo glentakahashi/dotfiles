@@ -7,27 +7,50 @@ I (think) it depends on solarized colorscheme and powerline fonts in your termin
 
 TODO:
 
-* on your servers, use ctrl+s or ctrl+b instead of ctrl+a so there is no overlap
-
 * Make environment/zsh/bashrc/profile all consistent
 * multiple tmux sessions, selector (windows)
 * use windows as different workspaces, sessions as different projects
 
 * remove dependencies on oh my zsh
-* fix neocomplcache and nerdtree and ctrlp
 * add in .profile .bash_profile and .zsh_profile
 * get better buffer navigator
 * learn how to use fugitive
-* make it a ton better to use nested tmux commands. I think it would be good to use Ctrl+a x2 to switch contexts between tmux sessions
-* make a new alias for easycd to go in reverse order
 * add sshconfig in maybe??? (definitely insecure)
 * make deploy script fail unless you are me! (i suggest people don't run it naked)
-* switch to pathogen instead of whatever i have now
+  * or ask questions and make a better spf13
 * folding and shit
 * move buffers around (ctrl+p for buffers or something)
 * SURROUND
+* Split vimrc into mutliple files based on plugin they're for?
 
 Some plugins to add:
 * vim-view maybe
 http://vimcasts.org/episodes/aligning-text-with-tabular-vim/
 vim-csv
+https://github.com/junegunn/vim-easy-align
+https://github.com/junegunn/vim-peekaboo
+https://github.com/junegunn/vim-fnr
+https://github.com/junegunn/mvmv
+#add gem scripts
+seoul256.vim 
+
+make sure you install vim with --with-lua
+brew install vim --with-lua
+
+
+## vimplug
+
+vim-oblique overrides the following keys by default:
+
+| Default Key | `<Plug>` map           | Description                                      |
+| ----------- | -------------------- | ------------------------------------------------ |
+| `/`         | `<Plug>(Oblique-/)`  | Forward search                                   |
+| `?`         | `<Plug>(Oblique-?)`  | Backward search                                  |
+| `z/`        | `<Plug>(Oblique-F/)` | Forward fuzzy-search                             |
+| `z?`        | `<Plug>(Oblique-F?)` | Backward fuzzy-search                            |
+| `n`         | `<Plug>(Oblique-n)`  | Repeat the last search                           |
+| `N`         | `<Plug>(Oblique-N)`  | Repeat the last search in the opposite direction |
+| `*`         | `<Plug>(Oblique-*)`  | Forward star-search (in normal and visual mode)  |
+| `#`         | `<Plug>(Oblique-#)`  | Backward star-search (in normal and visual mode) |
+| `g*`        | `<Plug>(Oblique-g*)` | Forward star-search (no word boundary match)     |
+| `g#`        | `<Plug>(Oblique-g#)` | Backward star-search (no word boundary match)    |
