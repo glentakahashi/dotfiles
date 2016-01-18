@@ -11,7 +11,6 @@ test -e ~/.dircolors && eval `dircolors -b ~/.dircolors`
 alias ls="ls --color=always" 
 alias grep="grep --color=always"
 alias egrep="egrep --color=always"
-alias fix-homebrew="sudo chown $(whoami):admin /usr/local && sudo chown -R $(whoami):admin /usr/local"
 
 #fix for sed for mac
 #we cannot export those because it screws over terminal encoding

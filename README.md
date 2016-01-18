@@ -7,19 +7,15 @@ I (think) it depends on solarized colorscheme and powerline fonts in your termin
 
 TODO:
 
-* Vundle
-
 * Make environment/zsh/bashrc/profile all consistent
 * multiple tmux sessions, selector (windows)
 * use windows as different workspaces, sessions as different projects
 
 * remove dependencies on oh my zsh
-* fix neocomplcache and nerdtree and ctrlp
 * add in .profile .bash_profile and .zsh_profile
 * get better buffer navigator
 * learn how to use fugitive
-* make a new alias for easycd to go in reverse order
-  * add sshconfig in maybe??? (definitely insecure)
+* add sshconfig in maybe??? (definitely insecure)
 * make deploy script fail unless you are me! (i suggest people don't run it naked)
   * or ask questions and make a better spf13
 * folding and shit

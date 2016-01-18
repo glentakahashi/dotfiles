@@ -84,4 +84,4 @@ touch ~/.tmux.local.conf
 touch ~/.zshrc.local
 touch ~/.vimrc.local
 
-vim +PluginInstall +qall
+vim +PlugClean +PlugUpdate +qall
