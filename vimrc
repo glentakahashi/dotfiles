@@ -19,6 +19,9 @@ map <leader>d :Bclose<CR>
 map <leader>D :Bclose!<CR>
 
 syntax on
+let g:syntastic_java_checkers=['javac']
+let g:syntastic_java_javac_config_file_enabled = 1
+let g:syntastic_java_javac_config_file_use_git_root = 1
 
 set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
