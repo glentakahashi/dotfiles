@@ -11,6 +11,8 @@ map <Leader> <Plug>(easymotion-prefix)
 let g:EasyMotion_smartcase = 1
 nmap s <Plug>(easymotion-s)
 
+set autochdir
+
 "allow buffers to be moved off of if they have changes
 set hidden
 

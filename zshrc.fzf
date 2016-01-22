@@ -40,3 +40,11 @@ fzf-easy-grep() {
 
 zle     -N   fzf-easy-grep
 bindkey '^G' fzf-easy-grep
+
+# fcoc - checkout git commit
+fcoc() {
+  local commits commit
+  commits=$(git log --pretty=format:"%h - %an, %ar : %s" --abbrev-commit --reverse) &&
+  commit=$(echo "$commits" | fzf --tac +s +m -e) &&
+  git checkout $(echo "$commit" | sed "s/ .*//")
+}
