@@ -15,7 +15,8 @@ Plug 'altercation/vim-colors-solarized'
 "git stuff
 
 "file navigation
-Plug 'glentakahashi/vim-tmux-navigator'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'mbbill/undotree'
 
 Plug 'hail2u/vim-css3-syntax'
 Plug 'Lokaltog/vim-easymotion'

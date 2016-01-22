@@ -83,6 +83,8 @@ endif
 inoremap <C-j> <Down>
 inoremap <C-k> <Up>
 
+noremap <silent> <Leader>u :UndotreeToggle<CR>
+
 if &term == 'xterm' || &term == 'screen'
   set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
 endif
@@ -338,6 +340,22 @@ endfunction
 noremap <leader>y "+y
 noremap <leader>p "+p
 
+let g:numbers_exclude = ['unite', 'tagbar', 'startify', 'gundo', 'vimshell', 'w3m', 'nerdtree', 'undotree']
+let g:undotree_WindowLayout = 4
+
+function! OpenCurrentAsNewTab()
+  if exists("s:maximized_pane")
+    unlet s:maximized_pane
+    tabclose
+  else
+    let s:maximized_pane = tempname()
+    let l:currentPos = getcurpos()
+    tabedit %
+    call setpos(".", l:currentPos)
+  endif
+endfunction
+nnoremap <C-[> :call OpenCurrentAsNewTab()<CR>
+
 " Toggle paste mode via Ctrl + Shift + P
 set pastetoggle=<F12>
 map <leader>. :set paste!<CR>
@@ -347,8 +365,8 @@ inoremap kj <Esc>
 "vnoremap kj <Esc>
 
 "key bindings for replace line and replace word
-noremap rw vep
-noremap ry Vp
+noremap <leader>rw vep
+noremap <leader>ry Vp
 
 " Easier horizontal scrolling
 map zl zL
@@ -371,6 +389,9 @@ map gj L
 " right left
 map gl g$
 map gh g0
+
+" fzf
+set rtp+=/usr/local/opt/fzf
 
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()
