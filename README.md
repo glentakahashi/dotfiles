@@ -41,6 +41,12 @@ seoul256.vim
 make sure you install vim with --with-lua
 brew install vim --with-lua
 
+youcompleteme, clang, xbuild(mono), etc.
+dependencies: go, rust, mono, clang, 
+https://github.com/Valloric/YouCompleteMe
+
+fish is a pretty awesome shell
+learn from fish
 
 ## vimplug
 

@@ -3,7 +3,8 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'amirh/HTML-AutoCloseTag'
 Plug 'rbgrouleff/bclose.vim'
-Plug 'Shougo/neocomplete.vim'
+"Plug 'Shougo/neocomplete.vim'
+Plug 'Valloric/YouCompleteMe'
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/nerdtree'
 Plug 'myusuf3/numbers.vim'

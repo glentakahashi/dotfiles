@@ -9,6 +9,9 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(git)
 source ~/.oh-my-zsh/oh-my-zsh.sh
 
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
 #vim is the best
 EDITOR="vim"
 
@@ -59,3 +62,9 @@ source ~/.zshrc.system
 source ~/.zshrc.local
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+zle     -N   fzf-history-widget
+bindkey '\er' fzf-history-widget
+
+zle     -N   fzf-file-widget
+bindkey '\et' fzf-file-widget
