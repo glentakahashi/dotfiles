@@ -33,6 +33,8 @@ let g:syntastic_java_checkers=['javac']
 let g:syntastic_java_javac_config_file_enabled = 1
 let g:syntastic_java_javac_config_file_use_git_root = 1
 
+autocmd! BufRead,BufNewFile,BufEnter *.tsx let g:syntastic_typescript_tsc_args = '--jsx react'
+
 augroup qf
     autocmd!
     autocmd FileType qf set nobuflisted

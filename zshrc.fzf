@@ -39,7 +39,7 @@ fzf-easy-grep() {
 }
 
 zle     -N   fzf-easy-grep
-bindkey '^G' fzf-easy-grep
+bindkey '\eg' fzf-easy-grep
 
 # fcoc - checkout git commit
 fcoc() {
