@@ -38,6 +38,14 @@ https://stackoverflow.com/questions/26554713/how-to-truncate-working-directory-i
 #add gem scripts
 seoul256.vim 
 
+https://github.com/haya14busa/vim-easyoperator-line
+https://github.com/takac/vim-hardtime
+https://github.com/justinmk/vim-sneak
+
+antigen - zsh plugin manager
+or better yet, a simple script that you specify a repo a branch and a relatilve file path and it will clone and source the file
+git@github.com:atweiden/fzf-extras.git
+
 make sure you install vim with --with-lua
 brew install vim --with-lua
 
@@ -47,6 +55,8 @@ https://github.com/Valloric/YouCompleteMe
 
 fish is a pretty awesome shell
 learn from fish
+
+curl -ksH "Authorization: Bearer $TOKEN" 'https://some-server:8450/api/resource/ri.gatekeeper..resource.root' | python -m json.tool | grep "operations" | less
 
 ## vimplug
 

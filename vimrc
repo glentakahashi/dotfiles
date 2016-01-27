@@ -31,9 +31,12 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_java_checkers=['javac']
 let g:syntastic_java_javac_config_file_enabled = 1
-let g:syntastic_java_javac_config_file_use_git_root = 1
 
-autocmd! BufRead,BufNewFile,BufEnter *.tsx let g:syntastic_typescript_tsc_args = '--jsx react'
+" Enable jsx for tsx files
+autocmd BufNewFile,BufReadPre *.tsx let g:syntastic_typescript_tsc_args = '--jsx react'
+
+" Search upwards for .syntastic_javac_config
+autocmd BufNewFile,BufReadPre *.java let g:syntastic_java_javac_config_file = findfile('.syntastic_javac_config', '.;')
 
 augroup qf
     autocmd!
