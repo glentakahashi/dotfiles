@@ -31,6 +31,8 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_java_checkers=['javac']
 let g:syntastic_java_javac_config_file_enabled = 1
+let g:syntastic_typescript_checkers = ['tslint', 'tsc']
+let g:syntastic_aggregate_errors = 1
 
 " Enable jsx for tsx files
 autocmd BufNewFile,BufReadPre *.tsx let g:syntastic_typescript_tsc_args = '--jsx react'
@@ -361,7 +363,7 @@ function! OpenCurrentAsNewTab()
     call setpos(".", l:currentPos)
   endif
 endfunction
-nnoremap <C-[> :call OpenCurrentAsNewTab()<CR>
+nnoremap <C-x> :call OpenCurrentAsNewTab()<CR>
 
 " Toggle paste mode via Ctrl + Shift + P
 set pastetoggle=<F12>

@@ -35,6 +35,7 @@ https://github.com/junegunn/vim-fnr
 https://github.com/junegunn/mvmv
 https://github.com/ggVGc/fzf_browser
 https://stackoverflow.com/questions/26554713/how-to-truncate-working-directory-in-prompt-to-show-first-and-last-folder
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 #add gem scripts
 seoul256.vim 
 
@@ -50,7 +51,9 @@ make sure you install vim with --with-lua
 brew install vim --with-lua
 
 youcompleteme, clang, xbuild(mono), etc.
-dependencies: go, rust, mono, clang, 
+dependencies: go, rust, mono, clang, cmake
+go,rust,mono,cmake are from homebre
+install clang by typing clang and using the UI
 https://github.com/Valloric/YouCompleteMe
 
 fish is a pretty awesome shell
