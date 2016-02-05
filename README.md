@@ -12,6 +12,7 @@ TODO:
 * use windows as different workspaces, sessions as different projects
 * add fugitive, syntastic to numbers_exclude
 * fix weird loclist issues with syntastic
+* add check for bufferclose to safely close fugitive windows and oher windows
 
 * remove dependencies on oh my zsh
 * add in .profile .bash_profile and .zsh_profile
