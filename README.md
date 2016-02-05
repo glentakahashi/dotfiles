@@ -94,3 +94,14 @@ vim-oblique overrides the following keys by default:
 | `#`         | `<Plug>(Oblique-#)`  | Backward star-search (in normal and visual mode) |
 | `g*`        | `<Plug>(Oblique-g*)` | Forward star-search (no word boundary match)     |
 | `g#`        | `<Plug>(Oblique-g#)` | Backward star-search (no word boundary match)    |
+
+## fzf
+
+| Token    | Match type           | Description                      |
+| -------- | -------------------- | -------------------------------- |
+| `sbtrkt` | fuzzy-match          | Items that match `sbtrkt`        |
+| `^music` | prefix-exact-match   | Items that start with `music`    |
+| `.mp3$`  | suffix-exact-match   | Items that end with `.mp3`       |
+| `'wild`  | exact-match (quoted) | Items that include `wild`        |
+| `!rmx`   | inverse-fuzzy-match  | Items that do not match `rmx`    |
+| `!'fire` | inverse-exact-match  | Items that do not include `fire` |
