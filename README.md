@@ -14,6 +14,9 @@ TODO:
 * fix weird loclist issues with syntastic
 * add check for bufferclose to safely close fugitive windows and oher windows
 
+* switch newline prompt to be the right and left unicode/emoji arrows, colorize for vim mode
+* colorize username + computer in prompt
+
 * remove dependencies on oh my zsh
 * add in .profile .bash_profile and .zsh_profile
 * get better buffer navigator
