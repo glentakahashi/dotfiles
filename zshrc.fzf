@@ -30,6 +30,7 @@ if [[ $- =~ i ]]; then
     local line
     IFS=':' line=($(ag --nobreak --noheading . | fzf-tmux)) &&
     vim +${line[2]} ${line[1]}
+    unset IFS
   }
 
   # fco - checkout git branch/tag
