@@ -9,6 +9,9 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(git)
 source ~/.oh-my-zsh/oh-my-zsh.sh
 
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
 #vim is the best
 EDITOR="vim"
 
@@ -21,14 +24,13 @@ alias reload-zshrc='source ~/.zshrc'
 alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
-#easygrep
-source ~/.fs-easymotion/easygrep.sh
-alias gg='easyGrepOpen'
 #most common commands - useful for determining what else i should alias to save time
-alias mosthist="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
-alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([a-zA-Z0-9]* ?[a-zA-Z0-9]*) .*/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
+alias mosthist="cat ~/.zsh_history | sed -E -n 's/.*;([^ ]*)( ?.*)/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
+alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([^ ]* ?[^ ]*)( ?.*)/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
 #recursive git status
-alias rgs='find . -type d -name '.git' | while read dir ; do sh -c "cd $dir/../ && echo -e \"\nGIT STATUS IN ${dir//\.git/}\" && git status -s" ; done'
+alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ && echo \"\nGIT STATUS IN ${dir//\.git/}\" && git status -s" ; done'
+#so many typos
+alias sl='ls'
 
 #commonslyusedstuff
 alias lsr='ls -lahtr'
@@ -50,6 +52,8 @@ html() {
 export GOPATH=~/go
 export PATH=$GOPATH/bin:$PATH
 
+source ~/z.sh
+
 #fzf aliases
 source ~/.zshrc.fzf
 
@@ -60,3 +64,9 @@ source ~/.zshrc.system
 source ~/.zshrc.local
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+zle     -N   fzf-history-widget
+bindkey '\er' fzf-history-widget
+
+zle     -N   fzf-file-widget
+bindkey '\et' fzf-file-widget

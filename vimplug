@@ -3,11 +3,12 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'amirh/HTML-AutoCloseTag'
 Plug 'rbgrouleff/bclose.vim'
-Plug 'Shougo/neocomplete.vim'
+Plug 'Valloric/YouCompleteMe'
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/nerdtree'
 Plug 'myusuf3/numbers.vim'
 Plug 'scrooloose/syntastic'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'bling/vim-airline'
 Plug 'bling/vim-bufferline'
 Plug 'altercation/vim-colors-solarized'
@@ -15,14 +16,14 @@ Plug 'altercation/vim-colors-solarized'
 "git stuff
 
 "file navigation
-Plug 'glentakahashi/vim-tmux-navigator'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'mbbill/undotree'
 
 Plug 'hail2u/vim-css3-syntax'
 Plug 'Lokaltog/vim-easymotion'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'nathanaelkane/vim-indent-guides'
-"Plug 'kien/ctrlp.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/vim-pseudocl'
 Plug 'junegunn/vim-oblique'

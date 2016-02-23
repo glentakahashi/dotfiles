@@ -26,6 +26,5 @@ socks() {
 
 unsocks() {
   gsettings set org.gnome.system.proxy mode "none"
-  ssh -S /tmp/socks.sock -O exit asdf
+  ssh -S /tmp/socks.sock -O exit
 }
-

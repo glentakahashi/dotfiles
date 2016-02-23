@@ -11,6 +11,8 @@ map <Leader> <Plug>(easymotion-prefix)
 let g:EasyMotion_smartcase = 1
 nmap s <Plug>(easymotion-s)
 
+set autochdir
+
 "allow buffers to be moved off of if they have changes
 set hidden
 
@@ -19,6 +21,59 @@ map <leader>d :Bclose<CR>
 map <leader>D :Bclose!<CR>
 
 syntax on
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_java_checkers=['javac']
+let g:syntastic_java_javac_config_file_enabled = 1
+let g:syntastic_typescript_checkers = ['tslint', 'tsc']
+let g:syntastic_aggregate_errors = 1
+
+" Enable jsx for tsx files
+autocmd BufNewFile,BufReadPre *.tsx let g:syntastic_typescript_tsc_args = '--jsx react'
+
+" Search upwards for .syntastic_javac_config
+autocmd BufNewFile,BufReadPre *.java let g:syntastic_java_javac_config_file = findfile('.syntastic_javac_config', '.;')
+
+augroup qf
+    autocmd!
+    autocmd FileType qf set nobuflisted
+augroup END
+
+function! GetBufferList()
+  redir =>buflist
+  silent! ls!
+  redir END
+  return buflist
+endfunction
+
+function! ToggleList(bufname, pfx)
+  let buflist = GetBufferList()
+  for bufnum in map(filter(split(buflist, '\n'), 'v:val =~ "'.a:bufname.'"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
+    if bufwinnr(bufnum) != -1
+      exec(a:pfx.'close')
+      return
+    endif
+  endfor
+  if a:pfx == 'l' && len(getloclist(0)) == 0
+      echohl ErrorMsg
+      echo "Location List is Empty."
+      return
+  endif
+  let winnr = winnr()
+  exec(a:pfx.'open')
+  if winnr() != winnr
+    wincmd p
+  endif
+endfunction
+
+nmap <silent> <leader>l :call ToggleList("Location List", 'l')<CR>
+nmap <silent> <leader>q :call ToggleList("Quickfix List", 'c')<CR>
 
 set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
@@ -36,6 +91,8 @@ endif
 
 inoremap <C-j> <Down>
 inoremap <C-k> <Up>
+
+noremap <silent> <Leader>u :UndotreeToggle<CR>
 
 if &term == 'xterm' || &term == 'screen'
   set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
@@ -204,7 +261,7 @@ function! s:all_files()
   \ map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), 'bufname(v:val)'))
 endfunction
 
-nnoremap <silent> <C-m> :FZFMru <CR>
+nnoremap <silent> <Leader>o :FZFMru <CR>
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
 noremap j gj
@@ -292,6 +349,22 @@ endfunction
 noremap <leader>y "+y
 noremap <leader>p "+p
 
+let g:numbers_exclude = ['unite', 'tagbar', 'startify', 'gundo', 'vimshell', 'w3m', 'nerdtree', 'undotree']
+let g:undotree_WindowLayout = 4
+
+function! OpenCurrentAsNewTab()
+  if exists("s:maximized_pane")
+    unlet s:maximized_pane
+    tabclose
+  else
+    let s:maximized_pane = tempname()
+    let l:currentPos = getcurpos()
+    tabedit %
+    call setpos(".", l:currentPos)
+  endif
+endfunction
+nnoremap <C-x> :call OpenCurrentAsNewTab()<CR>
+
 " Toggle paste mode via Ctrl + Shift + P
 set pastetoggle=<F12>
 map <leader>. :set paste!<CR>
@@ -301,8 +374,8 @@ inoremap kj <Esc>
 "vnoremap kj <Esc>
 
 "key bindings for replace line and replace word
-noremap rw vep
-noremap ry Vp
+noremap <leader>rw vep
+noremap <leader>ry Vp
 
 " Easier horizontal scrolling
 map zl zL
@@ -325,6 +398,9 @@ map gj L
 " right left
 map gl g$
 map gh g0
+
+" fzf
+set rtp+=/usr/local/opt/fzf
 
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()

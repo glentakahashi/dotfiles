@@ -1,22 +1,150 @@
-fvim() {
-  local files file
-  files=$(ag -p ~/.agignore -g "") &&
-  file=$(echo "$files" | fzf-tmux) &&
-  vim $file
-}
+if [[ $- =~ i ]]; then
 
-# fu - cd to selected parent directory
-fu() {
-  local declare dirs=()
-  get_parent_dirs() {
-    dirs+=("$1")
-    if [[ ${1} == '/' ]]; then
-      for _dir in ${dirs[@]}; do
-        echo $_dir
-      done
-    else
-      get_parent_dirs $(dirname $1)
+  fvim() {
+    local files file
+    files=$(ag -p ~/.agignore -g "") &&
+    file=$(echo "$files" | fzf-tmux) &&
+    vim $file
+  }
+
+  fzf-cd-up() {
+    local declare dirs=()
+    get_parent_dirs() {
+      dirs+=("$1")
+      if [[ ${1} == '/' ]]; then
+        for _dir in ${dirs[@]}; do
+          echo $_dir
+        done
+      else
+        get_parent_dirs "$(dirname $1)"
+      fi
+    }
+    DIR=$(get_parent_dirs "$(pwd)" | fzf-tmux) && cd "$DIR"
+    zle reset-prompt
+  }
+
+  zle     -N    fzf-cd-up
+  bindkey '\eu' fzf-cd-up
+
+  gfv() {
+    local line
+    line=($(ag --nobreak --noheading . | awk -F':' '{s = "\x1b[31;1m" $1 ":" $2 "\x1b[m\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf-tmux -- --ansi -d ":" -n 2)) &&
+    f=($(echo $line | awk -F':' '{print $1;}')) &&
+    line_num=($(echo $line | awk -F':' '{print $2;}' | awk -F' ' '{print $1;}')) &&
+    vim +${line_num} "${f}"
+  }
+
+  # fco - checkout git branch/tag
+  fco() {
+    local tags branches target
+    tags=$(
+      git tag | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
+    branches=$(
+      git branch --all | grep -v HEAD             |
+      sed "s/.* //"    | sed "s#remotes/[^/]*/##" |
+      sort -u          | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
+    target=$(
+      (echo "$tags"; echo "$branches") |
+      fzf-tmux -l50 -- --no-hscroll --ansi +m -d "\t" -n 2) || return
+    git checkout $(echo "$target" | awk '{print $2}')
+  }
+
+  # fcoc - checkout git commit
+  fcoc() {
+    local commits commit
+    commits=$(git log --pretty=format:"%h - %an, %ar : %s" --abbrev-commit --reverse) &&
+    commit=$(echo "$commits" | fzf-tmux --tac +s +m -e) &&
+    git checkout $(echo "$commit" | sed "s/ .*//")
+  }
+
+  # fshow - git commit browser
+  fshow() {
+    git log --graph --color=always \
+        --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    fzf-tmux --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+        --bind "ctrl-m:execute:
+                  (grep -o '[a-f0-9]\{7\}' | head -1 |
+                  xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                  {}
+  FZF-EOF"
+  }
+
+  # fs [FUZZY PATTERN] - Select selected tmux session
+  #   - Bypass fuzzy finder if there's only one match (--select-1)
+  #   - Exit if there's no match (--exit-0)
+  fs() {
+    local session
+    session=$(tmux list-sessions -F "#{session_name}" | \
+      fzf-tmux --query="$1" --select-1 --exit-0) &&
+    tmux switch-client -t "$session"
+  }
+
+  # fbr - checkout git branch (including remote branches)
+  fbr() {
+    local branches branch
+    branches=$(git branch --all | grep -v HEAD) &&
+    branch=$(echo "$branches" |
+             fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+    git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+  }
+
+  # ALT-I - Paste the selected entry from locate output into the command line
+  fzf-locate-widget() {
+    local selected
+    if selected=$(locate / | fzf); then
+      LBUFFER=$LBUFFER$selected
+    fi
+    zle redisplay
+  }
+  zle     -N    fzf-locate-widget
+  bindkey '\ei' fzf-locate-widget
+
+  # fe [FUZZY PATTERN] - Open the selected file with the default editor
+  #   - Bypass fuzzy finder if there's only one match (--select-1)
+  #   - Exit if there's no match (--exit-0)
+  fe() {
+    IFS='
+  '
+    local declare files=($(fzf-tmux --query="$1" --select-1 --exit-0))
+    [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+    unset IFS
+  }
+
+  # Modified version where you can press
+  #   - CTRL-O to open with `open` command,
+  #   - CTRL-E or Enter key to open with the $EDITOR
+  fo() {
+    local out file key
+    out=$(fzf-tmux --query="$1" --exit-0)
+    key=$(head -1 <<< "$out")
+    file=$(head -2 <<< "$out" | tail -1)
+    if [ -n "$file" ]; then
+      open "$file"
     fi
   }
-  DIR=$(get_parent_dirs ${1:-$(pwd)} | fzf-tmux --tac) && cd "$DIR"
-}
+
+  # cdf - cd into the directory of the selected file
+  fcd() {
+     local file
+     local dir
+     file=$(fzf-tmux +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
+  }
+
+  # fkill - kill process
+  fkill() {
+    pid=$(ps -ef | sed 1d | fzf-tmux -m | awk '{print $2}')
+
+    if [ "x$pid" != "x" ]
+    then
+      kill -${1:-9} $pid
+    fi
+  }
+
+  j() {
+    if [[ -z "$*" ]]; then
+      cd "$(_z -l 2>&1 | fzf-tmux +s --tac | sed 's/^[0-9,.]* *//')"
+    else
+      _z "$@"
+    fi
+  }
+fi
