@@ -28,9 +28,10 @@ if [[ $- =~ i ]]; then
 
   gfv() {
     local line
-    IFS=':' line=($(ag --nobreak --noheading . | fzf-tmux)) &&
-    vim +${line[2]} ${line[1]}
-    unset IFS
+    line=($(ag --nobreak --noheading . | awk -F':' '{s = "\x1b[31;1m" $1 ":" $2 "\x1b[m\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf-tmux -- --ansi -d ":" -n 2)) &&
+    f=($(echo $line | awk -F':' '{print $1;}')) &&
+    line_num=($(echo $line | awk -F':' '{print $2;}' | awk -F' ' '{print $1;}')) &&
+    vim +${line_num} "${f}"
   }
 
   # fco - checkout git branch/tag

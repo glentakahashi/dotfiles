@@ -43,6 +43,8 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 #add gem scripts
 seoul256.vim 
 
+git-flow
+
 https://github.com/haya14busa/vim-easyoperator-line
 https://github.com/takac/vim-hardtime
 https://github.com/justinmk/vim-sneak
