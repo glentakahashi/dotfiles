@@ -40,6 +40,8 @@ autocmd BufNewFile,BufReadPre *.tsx let g:syntastic_typescript_tsc_args = '--jsx
 " Search upwards for .syntastic_javac_config
 autocmd BufNewFile,BufReadPre *.java let g:syntastic_java_javac_config_file = findfile('.syntastic_javac_config', '.;')
 
+let g:syntastic_typescript_tsc_fname = ''
+
 augroup qf
     autocmd!
     autocmd FileType qf set nobuflisted

@@ -59,6 +59,7 @@ git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarize
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
 git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+curl -fLo ~/.z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
 
 #make the new symlinks
 ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf
@@ -84,3 +85,5 @@ touch ~/.zshrc.local
 touch ~/.vimrc.local
 
 vim +PlugClean +PlugUpdate +qall
+
+python ~/.vim/plugged/YouCompleteMe/install.py

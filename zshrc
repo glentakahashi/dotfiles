@@ -52,7 +52,7 @@ html() {
 export GOPATH=~/go
 export PATH=$GOPATH/bin:$PATH
 
-source ~/z.sh
+source ~/.z.sh
 
 #fzf aliases
 source ~/.zshrc.fzf
