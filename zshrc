@@ -9,6 +9,39 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 plugins=(git)
 source ~/.oh-my-zsh/oh-my-zsh.sh
 
+# Updates editor information when the keymap changes.
+function zle-keymap-select() {
+  zle reset-prompt
+  zle -R
+}
+
+# Ensure that the prompt is redrawn when the terminal size changes.
+TRAPWINCH() {
+  zle && { zle reset-prompt; zle -R }
+}
+
+zle -N zle-keymap-select
+zle -N edit-command-line
+
+
+bindkey -v
+
+# allow v to edit the command line (standard behaviour)
+autoload -Uz edit-command-line
+bindkey -M vicmd 'v' edit-command-line
+
+# allow ctrl-p, ctrl-n for navigate history (standard behaviour)
+bindkey '^P' up-history
+bindkey '^N' down-history
+
+# allow ctrl-h, ctrl-w, ctrl-? for char and word deletion (standard behaviour)
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+bindkey '^w' backward-kill-word
+
+#even for zsh
+bindkey -M viins 'kj' vi-cmd-mode
+
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LC_CTYPE="utf-8"
@@ -17,7 +50,7 @@ export LC_CTYPE="utf-8"
 EDITOR="vim"
 
 # 10ms for key sequences
-KEYTIMEOUT=1
+KEYTIMEOUT=100
 
 #TODO: add git bindings
 #aliases
@@ -33,6 +66,16 @@ alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ 
 #so many typos
 alias sl='ls'
 alias gw='./gradlew'
+
+weather() {
+  if [[ -z $1 ]]; then
+    curl wttr.in
+  else
+    curl wttr.in/$1
+  fi
+}
+
+alias wthr='weather'
 
 #commonslyusedstuff
 alias lsr='ls -lahtr'

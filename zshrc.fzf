@@ -28,7 +28,7 @@ if [[ $- =~ i ]]; then
 
   gfv() {
     local line
-    line=($(ag --nobreak --noheading . | awk -F':' '{s = "\x1b[31;1m" $1 ":" $2 "\x1b[m\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf-tmux -- --ansi -d ":" -n 2)) &&
+    line=($(ag --nobreak --noheading . | awk -F':' '{s = "\x1b[31;1m" $1 "\x1b[m:" $2 "\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf-tmux -- --ansi -d ":" -n 2)) &&
     f=($(echo $line | awk -F':' '{print $1;}')) &&
     line_num=($(echo $line | awk -F':' '{print $2;}' | awk -F' ' '{print $1;}')) &&
     vim +${line_num} "${f}"
@@ -137,6 +137,40 @@ if [[ $- =~ i ]]; then
     if [ "x$pid" != "x" ]
     then
       kill -${1:-9} $pid
+    fi
+  }
+
+  _getDockerContainer() {
+    echo $(docker ps | sed 1d | sed -E 's/ +/ /g' | cut -d' ' -f1,2 | awk -F' ' '{print "\x1b[31;1m" $1 "\x1b[m: " $2;}' | fzf-tmux -- --ansi -d ' ' -n 2 | awk -F':' '{print $1}')
+  }
+
+  # fdbash - open bash for a docker
+  fdbash() {
+    cid=$(_getDockerContainer)
+
+    if [ "x$cid" != "x" ]
+    then
+      docker exec -it $cid bash
+    fi
+  }
+
+  # fdlogs - get docker logs
+  fdlogs() {
+    cid=$(_getDockerContainer)
+
+    if [ "x$cid" != "x" ]
+    then
+      docker logs $cid
+    fi
+  }
+
+  # fdstop  - docker kill
+  fdstop() {
+    cid=$(_getDockerContainer)
+
+    if [ "x$cid" != "x" ]
+    then
+      docker stop $cid
     fi
   }
 
