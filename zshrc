@@ -11,6 +11,7 @@ source ~/.oh-my-zsh/oh-my-zsh.sh
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
+export LC_CTYPE="utf-8"
 
 #vim is the best
 EDITOR="vim"
@@ -31,6 +32,7 @@ alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([^ ]* ?[^ ]*)( ?.*)/\1/p'
 alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ && echo \"\nGIT STATUS IN ${dir//\.git/}\" && git status -s" ; done'
 #so many typos
 alias sl='ls'
+alias gw='./gradlew'
 
 #commonslyusedstuff
 alias lsr='ls -lahtr'
