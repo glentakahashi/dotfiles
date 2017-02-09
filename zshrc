@@ -54,7 +54,7 @@ KEYTIMEOUT=100
 
 #TODO: add git bindings
 #aliases
-alias reload-zshrc='source ~/.zshrc'
+alias reload-zshrc='exec zsh'
 alias grip='grep -riI'
 #simple http server
 alias http='python -m SimpleHTTPServer'
@@ -66,6 +66,7 @@ alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ 
 #so many typos
 alias sl='ls'
 alias gw='./gradlew'
+alias darn='yarn --pure-lockfile'
 
 weather() {
   if [[ -z $1 ]]; then
