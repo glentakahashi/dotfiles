@@ -1,0 +1,35 @@
+// Place your settings in this file to overwrite the default settings
+{
+    "editor.detectIndentation": true,
+    "http.proxyStrictSSL": true,
+    "vim.insertModeKeyBindings": [{
+        "before": [
+            "k",
+            "j"
+        ],
+        "after": [
+            "<Esc>"
+        ]
+    }],
+    "vim.easymotion": true,
+    "vim.leader": ",",
+    "vsicons.projectDetection.autoReload": true,
+    "window.zoomLevel": 0,
+    "stylelint.enable": true,
+    "css.validate": false,
+    "scss.validate": false,
+    "stylefmt.useStylelintConfigOverrides": true,
+    "vim.disableAnnoyingNeovimMessage": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "jspm_packages": true,
+        "node_modules": true
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/build": true,
+        "**/dist": true,
+        "node_modules": true
+    }
+}

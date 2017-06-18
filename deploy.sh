@@ -33,9 +33,9 @@ cd $SCRIPTPATH
 
 function backupIfNotSymlink() {
     if [[ -L $1 ]]; then
-        rm -v $1
+        rm -v "$1"
     elif [[ -e $1 ]]; then
-        mv -v -f $1 $1.bak
+        mv -v -f "$1" "$1.bak"
     fi
 }
 
@@ -54,6 +54,7 @@ backupIfNotSymlink ~/.gitconfig
 rm -rf ~/.vim.bak
 backupIfNotSymlink ~/.vim
 backupIfNotSymlink ~/.zsh
+backupIfNotSymlink ~/Library/Application\ Support/Code/User/settings.json
 
 git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarized
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
@@ -74,6 +75,10 @@ ln -v -s $SCRIPTPATH/template.html ~/.template.html
 #ln -v -s $SCRIPTPATH/gitconfig ~/.gitconfig
 #COPY GITCONFIG BECAUSE IF ITS BROKEN ITS ANNOYING TO MERGE
 cp -v $SCRIPTPATH/gitconfig ~/.gitconfig
+
+if [[ $SYSTEM == "darwin" ]]; then
+    ln -v -s $SCRIPTPATH/vscode.json ~/Library/Application\ Support/Code/User/settings.json
+fi
 
 #these two files depend upon system type
 ln -s $SCRIPTPATH/$SYSTEM/tmux.system.conf ~/.tmux.system.conf

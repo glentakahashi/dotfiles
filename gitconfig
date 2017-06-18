@@ -1,6 +1,6 @@
 [user]
   name = Glen Takahashi
-  email = me@glentaka.com
+  email = glen@glentaka.com
 
 [core]
   editor = vim
@@ -40,3 +40,6 @@
 
   # Amend the currently staged files to the latest commit
   amend = commit --amend --reuse-message=HEAD
+
+[rebase]
+  instructionFormat = (%an <%ae>) %s
