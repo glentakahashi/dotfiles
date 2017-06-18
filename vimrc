@@ -6,6 +6,9 @@ source ~/.vimplug
 let mapleader = ','
 set timeoutlen=1000 ttimeoutlen=0
 
+highlight ColorColumn ctermbg=gray
+set colorcolumn=140
+
 "easymotion shit
 map <Leader> <Plug>(easymotion-prefix)
 let g:EasyMotion_smartcase = 1
