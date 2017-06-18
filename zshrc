@@ -67,6 +67,7 @@ alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ 
 alias sl='ls'
 alias gw='./gradlew'
 alias darn='yarn --pure-lockfile'
+alias upgrade-yarn='curl -o- -L https://yarnpkg.com/install.sh | bash'
 
 weather() {
   if [[ -z $1 ]]; then
