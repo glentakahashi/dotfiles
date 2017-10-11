@@ -18,3 +18,7 @@ alias sed="LC_ALL=C sed"
 function copy() {
   cat $1 | pbcopy
 }
+
+function giffy() {
+    ffmpeg -i $1 -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > $2
+}
