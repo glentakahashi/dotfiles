@@ -24,6 +24,9 @@
   ci = commit
   al = add . --all
 
+  # find text
+  find = !"git log --source --all -S "
+
   #clone one of my own repos
   cc = !"git clone git@github.com:glentakahashi/$1"
 

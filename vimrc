@@ -239,6 +239,7 @@ let g:airline#extensions#tabline#enabled = 1
 
 " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline_section_c = "%F"
 
 
 "create splits using C+w+- and C+w+|
