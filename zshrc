@@ -32,6 +32,10 @@ alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ 
 #so many typos
 alias sl='ls'
 
+#yarn stuff
+alias upgrade-yarn='curl -o- -L https://yarnpkg.com/install.sh | bash'
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
 #commonslyusedstuff
 alias lsr='ls -lahtr'
 alias dust='du -hs * | sort -h'
