@@ -65,8 +65,6 @@ https://github.com/Valloric/YouCompleteMe
 fish is a pretty awesome shell
 learn from fish
 
-curl -ksH "Authorization: Bearer $TOKEN" 'https://some-server:8450/api/resource/ri.gatekeeper..resource.root' | python -m json.tool | grep "operations" | less
-
 # Dependencies
 
 * All
