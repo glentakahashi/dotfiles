@@ -6,6 +6,9 @@ source ~/.vimplug
 let mapleader = ','
 set timeoutlen=1000 ttimeoutlen=0
 
+highlight ColorColumn ctermbg=gray
+set colorcolumn=140
+
 "easymotion shit
 map <Leader> <Plug>(easymotion-prefix)
 let g:EasyMotion_smartcase = 1
@@ -39,6 +42,8 @@ autocmd BufNewFile,BufReadPre *.tsx let g:syntastic_typescript_tsc_args = '--jsx
 
 " Search upwards for .syntastic_javac_config
 autocmd BufNewFile,BufReadPre *.java let g:syntastic_java_javac_config_file = findfile('.syntastic_javac_config', '.;')
+
+let g:syntastic_typescript_tsc_fname = ''
 
 augroup qf
     autocmd!
@@ -194,10 +199,10 @@ set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic white
 set nowrap                      " Don't wrap long lines
 set autoindent                  " Indent at the same level of the previous line
 "todo, make this dependent on file
-set shiftwidth=2                " Use indents of 2 spaces
+set shiftwidth=4                " Use indents of 4 spaces
 set expandtab                   " Tabs are spaces, not tabs
-set tabstop=2                   " An indentation every four columns
-set softtabstop=2               " Let backspace delete indent
+set tabstop=4                   " An indentation every four columns
+set softtabstop=4               " Let backspace delete indent
 
 " Remove trailing whitespaces and ^M chars
 autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
@@ -234,6 +239,7 @@ let g:airline#extensions#tabline#enabled = 1
 
 " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline_section_c = "%F"
 
 
 "create splits using C+w+- and C+w+|
@@ -262,6 +268,24 @@ function! s:all_files()
 endfunction
 
 nnoremap <silent> <Leader>o :FZFMru <CR>
+
+function! s:buflist()
+  redir => ls
+  silent ls
+  redir END
+  return split(ls, '\n')
+endfunction
+
+function! s:bufopen(e)
+  execute 'buffer' matchstr(a:e, '^[ 0-9]*')
+endfunction
+
+nnoremap <silent> ; :call fzf#run({
+\   'source':  reverse(<sid>buflist()),
+\   'sink':    function('<sid>bufopen'),
+\   'options': '+m',
+\   'down':    len(<sid>buflist()) + 2
+\ })<CR>
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
 noremap j gj

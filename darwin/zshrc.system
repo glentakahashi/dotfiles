@@ -3,7 +3,7 @@
 #java
 export JAVA_HOME=`/usr/libexec/java_home`
 
-export PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin/:/usr/bin/:~/bin/:/usr/local/lib64/:$PATH
+export PATH=$HOME/.yarn/bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/sbin:/usr/bin:~/bin:/usr/local/lib64:$PATH
 export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 
 #mac needs overrides to use colors
@@ -15,3 +15,10 @@ alias egrep="egrep --color=always"
 #fix for sed for mac
 #we cannot export those because it screws over terminal encoding
 alias sed="LC_ALL=C sed"
+function copy() {
+  cat $1 | pbcopy
+}
+
+function giffy() {
+    ffmpeg -i $1 -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > $2
+}
