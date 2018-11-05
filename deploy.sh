@@ -56,6 +56,7 @@ backupIfNotSymlink ~/.vim
 backupIfNotSymlink ~/.zsh
 backupIfNotSymlink ~/Library/Application\ Support/Code/User/settings.json
 
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarized
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
 git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
