@@ -1,9 +1,11 @@
 if [[ $- =~ i ]]; then
 
+  export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
   fvim() {
     local files file
     files=$(ag -p ~/.agignore -g "") &&
-    file=$(echo "$files" | fzf-tmux) &&
+    file=$(echo "$files" | fzf) &&
     vim $file
   }
 
@@ -19,7 +21,7 @@ if [[ $- =~ i ]]; then
         get_parent_dirs "$(dirname $1)"
       fi
     }
-    DIR=$(get_parent_dirs "$(pwd)" | fzf-tmux) && cd "$DIR"
+    DIR=$(get_parent_dirs "$(pwd)" | fzf) && cd "$DIR"
     zle reset-prompt
   }
 
@@ -29,7 +31,7 @@ if [[ $- =~ i ]]; then
   gfv() {
     local line
     P=${1:-".*"}
-    line=($(ag --nobreak --noheading -G $P . | awk -F':' '{s = "\x1b[31;1m" $1 "\x1b[m:" $2 "\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf-tmux -- --ansi -d ":" -n 2)) &&
+    line=($(ag --nobreak --noheading -G $P . | awk -F':' '{s = "\x1b[31;1m" $1 "\x1b[m:" $2 "\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf --ansi -d ":" -n 2)) &&
     f=($(echo $line | awk -F':' '{print $1;}')) &&
     line_num=($(echo $line | awk -F':' '{print $2;}' | awk -F' ' '{print $1;}')) &&
     vim +${line_num} "${f}"
@@ -46,7 +48,7 @@ if [[ $- =~ i ]]; then
       sort -u          | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
     target=$(
       (echo "$tags"; echo "$branches") |
-      fzf-tmux -l50 -- --no-hscroll --ansi +m -d "\t" -n 2) || return
+      fzf --no-hscroll --ansi +m -d "\t" -n 2) || return
     git checkout $(echo "$target" | awk '{print $2}')
   }
 
@@ -54,7 +56,7 @@ if [[ $- =~ i ]]; then
   fcoc() {
     local commits commit
     commits=$(git log --pretty=format:"%h - %an, %ar : %s" --abbrev-commit --reverse) &&
-    commit=$(echo "$commits" | fzf-tmux --tac +s +m -e) &&
+    commit=$(echo "$commits" | fzf --tac +s +m -e) &&
     git checkout $(echo "$commit" | sed "s/ .*//")
   }
 
@@ -62,7 +64,7 @@ if [[ $- =~ i ]]; then
   fshow() {
     git log --graph --color=always \
         --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-    fzf-tmux --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+    fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
         --bind "ctrl-m:execute:
                   (grep -o '[a-f0-9]\{7\}' | head -1 |
                   xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
@@ -76,7 +78,7 @@ if [[ $- =~ i ]]; then
   fs() {
     local session
     session=$(tmux list-sessions -F "#{session_name}" | \
-      fzf-tmux --query="$1" --select-1 --exit-0) &&
+      fzf --query="$1" --select-1 --exit-0) &&
     tmux switch-client -t "$session"
   }
 
@@ -85,7 +87,7 @@ if [[ $- =~ i ]]; then
     local branches branch
     branches=$(git branch --all | grep -v HEAD) &&
     branch=$(echo "$branches" |
-             fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+             fzf -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
     git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
   }
 
@@ -106,7 +108,7 @@ if [[ $- =~ i ]]; then
   fe() {
     IFS='
   '
-    local declare files=($(fzf-tmux --query="$1" --select-1 --exit-0))
+    local declare files=($(fzf --query="$1" --select-1 --exit-0))
     [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
     unset IFS
   }
@@ -116,7 +118,7 @@ if [[ $- =~ i ]]; then
   #   - CTRL-E or Enter key to open with the $EDITOR
   fo() {
     local out file key
-    out=$(fzf-tmux --query="$1" --exit-0)
+    out=$(fzf --query="$1" --exit-0)
     key=$(head -1 <<< "$out")
     file=$(head -2 <<< "$out" | tail -1)
     if [ -n "$file" ]; then
@@ -128,12 +130,12 @@ if [[ $- =~ i ]]; then
   fcd() {
      local file
      local dir
-     file=$(fzf-tmux +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
+     file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
   }
 
   # fkill - kill process
   fkill() {
-    pid=$(ps -ef | sed 1d | fzf-tmux -m | awk '{print $2}')
+    pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
 
     if [ "x$pid" != "x" ]
     then
@@ -142,7 +144,7 @@ if [[ $- =~ i ]]; then
   }
 
   _getDockerContainer() {
-    echo $(docker ps | sed 1d | sed -E 's/ +/ /g' | cut -d' ' -f1,2 | awk -F' ' '{print "\x1b[31;1m" $1 "\x1b[m: " $2;}' | fzf-tmux -- --ansi -d ' ' -n 2 | awk -F':' '{print $1}')
+    echo $(docker ps | sed 1d | sed -E 's/ +/ /g' | cut -d' ' -f1,2 | awk -F' ' '{print "\x1b[31;1m" $1 "\x1b[m: " $2;}' | fzf --ansi -d ' ' -n 2 | awk -F':' '{print $1}')
   }
 
   # fdbash - open bash for a docker
@@ -177,7 +179,7 @@ if [[ $- =~ i ]]; then
 
   j() {
     if [[ -z "$*" ]]; then
-      cd "$(_z -l 2>&1 | fzf-tmux +s --tac | sed 's/^[0-9,.]* *//')"
+      cd "$(_z -l 2>&1 | fzf +s --tac | sed 's/^[0-9,.]* *//')"
     else
       _z "$@"
     fi

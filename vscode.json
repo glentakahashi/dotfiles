@@ -3,23 +3,16 @@
     "editor.detectIndentation": true,
     "http.proxyStrictSSL": true,
     "vim.insertModeKeyBindings": [{
-        "before": [
-            "k",
-            "j"
-        ],
-        "after": [
-            "<Esc>"
-        ]
+        "before": ["k", "j"],
+        "after": ["<Esc>"]
     }],
     "vim.easymotion": true,
     "vim.leader": ",",
     "vsicons.projectDetection.autoReload": true,
     "window.zoomLevel": 0,
-    "stylelint.enable": true,
     "css.validate": false,
     "scss.validate": false,
-    "stylefmt.useStylelintConfigOverrides": true,
-    "vim.disableAnnoyingNeovimMessage": true,
+    "editor.formatOnSave": true,
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
@@ -32,5 +25,7 @@
         "**/dist": true,
         "node_modules": true
     },
-    "workbench.iconTheme": "vscode-icons"
+    "workbench.iconTheme": "vscode-icons",
+    "python.formatting.provider": "yapf",
+    "python.venvPath": "~/.environments",
 }

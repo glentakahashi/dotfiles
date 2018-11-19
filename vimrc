@@ -401,6 +401,9 @@ inoremap kj <Esc>
 noremap <leader>rw vep
 noremap <leader>ry Vp
 
+"open in vscode at same spot
+noremap <leader>vs :silent exec "! code --goto " . expand('%:p') . ':' . line(".") . ':' . col(".")<CR>
+
 " Easier horizontal scrolling
 map zl zL
 map zh zH
