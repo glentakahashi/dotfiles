@@ -1,40 +1,49 @@
 filetype off
 call plug#begin('~/.vim/plugged')
 
-Plug 'amirh/HTML-AutoCloseTag'
 Plug 'rbgrouleff/bclose.vim'
-Plug 'Valloric/YouCompleteMe'
+
 Plug 'scrooloose/nerdcommenter'
-Plug 'scrooloose/nerdtree'
-Plug 'myusuf3/numbers.vim'
 Plug 'scrooloose/syntastic'
+
+Plug 'ajh17/VimCompletesMe'
+
+" themes
 Plug 'vim-airline/vim-airline-themes'
 Plug 'bling/vim-airline'
 Plug 'altercation/vim-colors-solarized'
+Plug 'myusuf3/numbers.vim'
+Plug 'nathanaelkane/vim-indent-guides'
 
 "git stuff
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
 
 "file navigation
+Plug 'scrooloose/nerdtree'
+
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'mbbill/undotree'
 
-Plug 'hail2u/vim-css3-syntax'
+"movement
 Plug 'Lokaltog/vim-easymotion'
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-Plug 'nathanaelkane/vim-indent-guides'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/vim-pseudocl'
-Plug 'junegunn/vim-oblique'
-Plug 'junegunn/vim-peekaboo'
 Plug 'terryma/vim-multiple-cursors'
 
+"searching
+Plug 'junegunn/vim-slash'
+
+"buffers
+Plug 'junegunn/vim-peekaboo'
+
+"formatting
+Plug 'junegunn/vim-easy-align'
+
 "Languages
+Plug 'hail2u/vim-css3-syntax'
+Plug 'cakebaker/scss-syntax.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'mustache/vim-mustache-handlebars'
 Plug 'elzr/vim-json'
-Plug 'groenewege/vim-less'
-Plug 'kchmck/vim-coffee-script'
 
 call plug#end()            " required
 filetype plugin indent on    " required
