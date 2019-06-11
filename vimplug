@@ -32,6 +32,7 @@ Plug 'terryma/vim-multiple-cursors'
 
 "searching
 Plug 'junegunn/vim-slash'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 
 "buffers
 Plug 'junegunn/vim-peekaboo'
