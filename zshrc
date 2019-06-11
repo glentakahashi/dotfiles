@@ -97,7 +97,7 @@ html() {
 }
 
 #fixes
-#export TERM=screen-256color
+export TERM=screen-256color
 
 #go stuff
 export GOPATH=~/go

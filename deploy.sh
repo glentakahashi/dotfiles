@@ -7,7 +7,7 @@ SYSTEM=${OSTYPE//[0-9.]/}
 
 #warn if they already have one of the .bak files that exists
 if [[  -e ~/.tmux.conf.bak || -e ~/.tmux.reset.conf.bak \
-    || -e ~/.tmux.colors.conf.bak || -e ~/.tmux.system.conf.bak \
+    || -e ~/.tmux.system.conf.bak \
     || -e ~/.zshrc.bak || -e ~/.vimrc.bak \
     || -e ~/.dircolors.bak || -e ~/.vim.bak
     || -e ~/.zsh.bak || -e ~/.gitconfig.bak ]]; then
@@ -42,7 +42,6 @@ function backupIfNotSymlink() {
 #remove symlinks if they exist or backup file
 backupIfNotSymlink ~/.tmux.conf
 backupIfNotSymlink ~/.tmux.reset.conf
-backupIfNotSymlink ~/.tmux.colors.conf
 backupIfNotSymlink ~/.tmux.system.conf
 backupIfNotSymlink ~/.zshrc
 backupIfNotSymlink ~/.zshrc.system
@@ -58,7 +57,6 @@ backupIfNotSymlink ~/Library/Application\ Support/Code/User/settings.json
 backupIfNotSymlink ~/.template.html
 
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarized
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
 git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -67,7 +65,6 @@ curl -fLo ~/.z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
 #make the new symlinks
 ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf
 ln -v -s $SCRIPTPATH/tmux.reset.conf ~/.tmux.reset.conf
-ln -v -s ~/.tmux-colors-solarized/tmuxcolors-256.conf ~/.tmux.colors.conf
 ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
 ln -v -s $SCRIPTPATH/vimplug ~/.vimplug
 ln -v -s $SCRIPTPATH/zshrc ~/.zshrc

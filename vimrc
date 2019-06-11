@@ -112,6 +112,8 @@ endif
 color solarized                 " Load a colorscheme
 set background=dark
 
+hi Normal ctermbg=none          " Use background from terminal
+
 set tabpagemax=15               " Only show 15 tabs
 set showmode                    " Display the current mode
 set cursorline                  " Highlight current line
@@ -148,8 +150,7 @@ function! InitializeDirectories()
   let dir_list = {
         \ 'backup': 'backupdir',
         \ 'views': 'viewdir',
-        \ 'swap': 'directory' }
-
+        \ 'swap': 'directory' } 
   if has('persistent_undo')
     let dir_list['undo'] = 'undodir'
   endif
