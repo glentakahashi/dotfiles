@@ -14,6 +14,7 @@ Plug 'bling/vim-airline'
 Plug 'altercation/vim-colors-solarized'
 Plug 'myusuf3/numbers.vim'
 Plug 'nathanaelkane/vim-indent-guides'
+Plug 'tpope/vim-sleuth'
 
 "git stuff
 Plug 'tpope/vim-fugitive'
@@ -44,6 +45,7 @@ Plug 'cakebaker/scss-syntax.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'mustache/vim-mustache-handlebars'
 Plug 'elzr/vim-json'
+Plug 'stephpy/vim-yaml'
 
 call plug#end()            " required
 filetype plugin indent on    " required

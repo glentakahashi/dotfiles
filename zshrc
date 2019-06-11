@@ -1,3 +1,4 @@
+#zmodload zsh/zprof
 source /etc/profile
 
 # oh-my-zsh options
@@ -80,7 +81,6 @@ weather() {
 alias wthr='weather'
 
 #yarn stuff
-alias upgrade-yarn='curl -o- -L https://yarnpkg.com/install.sh | bash'
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 #commonslyusedstuff
@@ -124,3 +124,4 @@ bindkey '\et' fzf-file-widget
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
+#zprof

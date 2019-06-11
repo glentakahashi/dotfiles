@@ -1,31 +1,55 @@
 // Place your settings in this file to overwrite the default settings
 {
-    "editor.detectIndentation": true,
-    "http.proxyStrictSSL": true,
-    "vim.insertModeKeyBindings": [{
-        "before": ["k", "j"],
-        "after": ["<Esc>"]
-    }],
-    "vim.easymotion": true,
-    "vim.leader": ",",
-    "vsicons.projectDetection.autoReload": true,
-    "window.zoomLevel": 0,
-    "css.validate": false,
-    "scss.validate": false,
-    "editor.formatOnSave": true,
-    "files.exclude": {
-        "**/.git": true,
-        "**/.DS_Store": true,
-        "jspm_packages": true,
-        "node_modules": true
-    },
-    "search.exclude": {
-        "**/.git": true,
-        "**/build": true,
-        "**/dist": true,
-        "node_modules": true
-    },
-    "workbench.iconTheme": "vscode-icons",
-    "python.formatting.provider": "yapf",
-    "python.venvPath": "~/.environments",
+  "editor.detectIndentation": true,
+  "http.proxyStrictSSL": true,
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["k", "j"],
+      "after": ["<Esc>"]
+    }
+  ],
+  "vim.easymotion": true,
+  "vim.leader": ",",
+  "vsicons.projectDetection.autoReload": true,
+  "window.zoomLevel": 0,
+  "editor.formatOnSave": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "jspm_packages": true
+    // "node_modules": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/build": true,
+    "**/dist": true
+    // "node_modules": true
+  },
+  "workbench.iconTheme": "vscode-icons",
+  "python.formatting.provider": "yapf",
+  "python.venvPath": "~/.environments",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pyTestEnabled": true,
+  "python.testing.pyTestArgs": ["--app-name=pilot", "-p no:flaky"],
+  "python.testing.nosetestsEnabled": false,
+  "gitlens.codeLens.authors.enabled": false,
+  "gitlens.codeLens.recentChange.enabled": false,
+  "jest.runAllTestsFirst": false,
+  "prettier.disableLanguages": ["scss", "vue", "json"],
+  "python.jediEnabled": false,
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.mypyArgs": [],
+  "eslint.packageManager": "yarn",
+  "eslint.autoFixOnSave": true,
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "vim.enableNeovim": true,
+  "vim.neovimPath": "/usr/local/bin/nvim",
+  "breadcrumbs.enabled": true,
+  "editor.renderWhitespace": "none",
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue"
 }
