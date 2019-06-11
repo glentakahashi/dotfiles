@@ -9,6 +9,13 @@ set timeoutlen=1000 ttimeoutlen=0
 highlight ColorColumn ctermbg=gray
 set colorcolumn=140
 
+"vim-easy-align
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
 "easymotion shit
 map <Leader> <Plug>(easymotion-prefix)
 let g:EasyMotion_smartcase = 1

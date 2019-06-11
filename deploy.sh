@@ -55,6 +55,7 @@ rm -rf ~/.vim.bak
 backupIfNotSymlink ~/.vim
 backupIfNotSymlink ~/.zsh
 backupIfNotSymlink ~/Library/Application\ Support/Code/User/settings.json
+backupIfNotSymlink ~/.template.html
 
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 git clone https://github.com/seebi/tmux-colors-solarized ~/.tmux-colors-solarized

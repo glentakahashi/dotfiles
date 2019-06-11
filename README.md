@@ -6,6 +6,7 @@ Especially because the gitconfig file contains references to my own username, em
 I (think) it depends on solarized colorscheme and powerline fonts in your terminal or everything will look like shit.
 
 TODO:
+* Make update script
 
 * Make environment/zsh/bashrc/profile all consistent
 * multiple tmux sessions, selector (windows)
