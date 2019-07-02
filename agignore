@@ -16,3 +16,4 @@
 *.plist
 *.pdf
 *.log
+*.pyc
