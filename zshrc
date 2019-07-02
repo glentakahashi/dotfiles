@@ -104,6 +104,25 @@ html() {
 #fixes
 #export TERM=xterm-256color
 
+if [[ ! -z $ELECTRON_RUN_AS_NODE ]]; then
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+else
+    if [ -s "$HOME/.nvm/nvm.sh" ] && [ ! "$(type -f __init_nvm)" = function ]; then
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+        declare -a __node_commands=(nvm yarn `find -L $NVM_DIR/versions/*/*/bin -type f -exec basename {} \; | sort -u`)
+        function __init_nvm() {
+            for i in "${__node_commands[@]}"; do unalias $i; done
+            . "$NVM_DIR"/nvm.sh
+            unset __node_commands
+            unset -f __init_nvm
+        }
+        for i in "${__node_commands[@]}"; do alias $i='__init_nvm && '$i; done
+    fi
+fi
+
 #go stuff
 export GOPATH=~/go
 export PATH=$GOPATH/bin:$PATH
