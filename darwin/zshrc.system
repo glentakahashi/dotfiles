@@ -3,7 +3,7 @@
 #java
 export JAVA_HOME=`/usr/libexec/java_home`
 
-export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/sbin:/usr/bin:~/bin:/usr/local/lib64:$PATH
+export PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/sbin:/usr/bin:~/bin:/usr/local/lib64:$PATH
 export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
 
 #mac needs overrides to use colors
@@ -22,3 +22,5 @@ function copy() {
 function giffy() {
     ffmpeg -i $1 -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > $2
 }
+
+export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"

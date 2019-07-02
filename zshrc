@@ -70,6 +70,11 @@ alias gw='./gradlew'
 alias darn='yarn --pure-lockfile'
 alias upgrade-yarn='curl -o- -L https://yarnpkg.com/install.sh | bash'
 
+alias dcs='docker-compose stop'
+alias dcu='docker-compose up -d'
+alias dcr='docker-compose restart'
+alias dcl='docker-compose logs -f'
+
 weather() {
   if [[ -z $1 ]]; then
     curl wttr.in
@@ -81,7 +86,7 @@ weather() {
 alias wthr='weather'
 
 #yarn stuff
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
 
 #commonslyusedstuff
 alias lsr='ls -lahtr'
