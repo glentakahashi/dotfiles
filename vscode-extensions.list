@@ -1,4 +1,3 @@
-adamwalzer.scss-lint
 dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
@@ -6,11 +5,9 @@ hbenl.vscode-test-explorer
 kumar-harsh.graphql-for-vscode
 mattlott.copy-github-url
 ms-azuretools.vscode-docker
-ms-pyright.pyright
 ms-python.python
 Orta.vscode-jest
 redhat.java
-sasa.vscode-sass-format
 shinnn.stylelint
 VisualStudioExptTeam.vscodeintellicode
 vscjava.vscode-java-debug

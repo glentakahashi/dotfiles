@@ -4,8 +4,13 @@
   "http.proxyStrictSSL": true,
   "vim.insertModeKeyBindings": [
     {
-      "before": ["k", "j"],
-      "after": ["<Esc>"]
+      "before": [
+        "k",
+        "j"
+      ],
+      "after": [
+        "<Esc>"
+      ]
     }
   ],
   "vim.easymotion": true,
@@ -16,32 +21,39 @@
   "files.exclude": {
     "**/.git": true,
     "**/.DS_Store": true,
-    "jspm_packages": true
-    // "node_modules": true
+    "jspm_packages": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "node_modules": true
   },
   "search.exclude": {
     "**/.git": true,
     "**/build": true,
-    "**/dist": true
-    // "node_modules": true
+    "**/dist": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "node_modules": true
   },
   "workbench.iconTheme": "vscode-icons",
   "python.formatting.provider": "yapf",
-  "python.venvPath": "~/.environments",
   "python.testing.unittestEnabled": false,
-  "python.testing.pyTestEnabled": true,
-  "python.testing.pyTestArgs": ["--app-name=pilot", "-p no:flaky"],
+  "python.testing.pytestEnabled": true,
   "python.testing.nosetestsEnabled": false,
   "gitlens.codeLens.authors.enabled": false,
   "gitlens.codeLens.recentChange.enabled": false,
   "jest.runAllTestsFirst": false,
-  "prettier.disableLanguages": ["scss", "vue", "json"],
+  "prettier.disableLanguages": [
+    "scss",
+    "vue",
+    "json"
+  ],
   "python.jediEnabled": false,
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": true,
+  "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
   "python.linting.mypyArgs": [],
-  "eslint.packageManager": "yarn",
+  "eslint.packageManager": "npm",
   "eslint.autoFixOnSave": true,
   "css.validate": false,
   "less.validate": false,
@@ -51,5 +63,10 @@
   "breadcrumbs.enabled": true,
   "editor.renderWhitespace": "none",
   "editor.suggestSelection": "first",
-  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue"
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always"
 }
