@@ -20,10 +20,12 @@
   "editor.formatOnSave": true,
   "files.exclude": {
     "**/.git": true,
+    "**/*.pyc": true,
     "**/.DS_Store": true,
     "jspm_packages": true,
     "**/.mypy_cache": true,
     "**/.pytest_cache": true,
+    "**/__pycache__": true,
     "node_modules": true
   },
   "search.exclude": {
@@ -44,8 +46,7 @@
   "jest.runAllTestsFirst": false,
   "prettier.disableLanguages": [
     "scss",
-    "vue",
-    "json"
+    "vue"
   ],
   "python.jediEnabled": false,
   "python.linting.enabled": true,
@@ -53,7 +54,7 @@
   "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
   "python.linting.mypyArgs": [],
-  "eslint.packageManager": "npm",
+  "eslint.packageManager": "yarn",
   "eslint.autoFixOnSave": true,
   "css.validate": false,
   "less.validate": false,
@@ -68,5 +69,27 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "typescript.updateImportsOnFileMove.enabled": "always"
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.minimap.enabled": false,
+  "explorer.confirmDragAndDrop": false,
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "terraform.indexing": {
+    "enabled": false,
+    "liveIndexing": false,
+    "delay": 500,
+    "exclude": [
+      ".terraform/**/*",
+      "**/.terraform/**/*"
+    ]
+  },
+  "terraform.languageServer": {
+    "enabled": true,
+    "args": []
+  },
+  "explorer.confirmDelete": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }

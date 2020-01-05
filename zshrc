@@ -75,6 +75,13 @@ alias dcu='docker-compose up -d'
 alias dcr='docker-compose restart'
 alias dcl='docker-compose logs -f'
 
+# Formatting aliases
+json() {
+  cat $1 | python -m json.tool
+}
+
+alias pes='pipenv shell'
+
 weather() {
   if [[ -z $1 ]]; then
     curl wttr.in
@@ -99,6 +106,10 @@ html() {
     return 1;
   fi
   cp ~/.template.html $1
+}
+
+gscb() {
+  git stash && git checkout master && git pull && git checkout -b $1 && git stash pop
 }
 
 #fixes
