@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Install dependencies
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace
+
+# TODO: install tmux from source
+
 #get the directly of where this script is run, and consequently where the files are located
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 
