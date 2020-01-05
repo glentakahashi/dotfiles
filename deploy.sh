@@ -2,7 +2,7 @@
 
 # Install dependencies
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux
+brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux node ag
 
 # TODO: install tmux from source
 
