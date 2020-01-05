@@ -1,11 +1,14 @@
+apollographql.vscode-apollo
 dbaeumer.vscode-eslint
 eamodio.gitlens
 esbenp.prettier-vscode
 hbenl.vscode-test-explorer
-kumar-harsh.graphql-for-vscode
 mattlott.copy-github-url
+mauve.terraform
+mikestead.dotenv
 ms-azuretools.vscode-docker
 ms-python.python
+ms-vscode.Go
 Orta.vscode-jest
 redhat.java
 shinnn.stylelint
