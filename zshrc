@@ -75,6 +75,8 @@ alias dcu='docker-compose up -d'
 alias dcr='docker-compose restart'
 alias dcl='docker-compose logs -f'
 
+alias python='python3'
+
 # Formatting aliases
 json() {
   cat $1 | python -m json.tool
