@@ -1,5 +1,6 @@
 #zmodload zsh/zprof
 source /etc/profile
+source ~/.kube-ps1/kube-ps1.sh
 
 # oh-my-zsh options
 ZSH=~/.oh-my-zsh
@@ -134,10 +135,6 @@ else
     fi
 fi
 
-#go stuff
-export GOPATH=~/go
-export PATH=$GOPATH/bin:$PATH
-
 source ~/.z.sh
 
 #fzf aliases
@@ -160,3 +157,6 @@ bindkey '\et' fzf-file-widget
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 #zprof
+
+# krew path
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"

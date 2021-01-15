@@ -1,6 +1,7 @@
 apollographql.vscode-apollo
 dbaeumer.vscode-eslint
 eamodio.gitlens
+erd0s.terraform-autocomplete
 esbenp.prettier-vscode
 hbenl.vscode-test-explorer
 mattlott.copy-github-url
@@ -11,7 +12,7 @@ ms-python.python
 ms-vscode.Go
 Orta.vscode-jest
 redhat.java
-shinnn.stylelint
+stylelint.vscode-stylelint
 VisualStudioExptTeam.vscodeintellicode
 vscjava.vscode-java-debug
 vscjava.vscode-java-dependency

@@ -48,19 +48,15 @@
     "scss",
     "vue"
   ],
-  "python.jediEnabled": false,
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": true,
   "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
   "python.linting.mypyArgs": [],
   "eslint.packageManager": "yarn",
-  "eslint.autoFixOnSave": true,
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
-  "vim.enableNeovim": true,
-  "vim.neovimPath": "/usr/local/bin/nvim",
   "breadcrumbs.enabled": true,
   "editor.renderWhitespace": "none",
   "editor.suggestSelection": "first",
@@ -72,24 +68,23 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.minimap.enabled": false,
   "explorer.confirmDragAndDrop": false,
-  "[yaml]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "terraform.indexing": {
-    "enabled": false,
-    "liveIndexing": false,
-    "delay": 500,
-    "exclude": [
-      ".terraform/**/*",
-      "**/.terraform/**/*"
-    ]
-  },
   "terraform.languageServer": {
-    "enabled": true,
-    "args": []
+    "external": true,
+    "pathToBinary": "",
+    "args": [
+      "serve"
+    ],
+    "maxNumberOfProblems": 100,
+    "trace.server": "off"
   },
   "explorer.confirmDelete": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  }
+},
+"python.languageServer": "Microsoft",
+"[jsonc]": {
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+},
+"tabnine.experimentalAutoImports": true,
+"python.showStartPage": false
 }

@@ -2,7 +2,7 @@
 
 # Install dependencies
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux node ag
+brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux node ag neovim
 
 # TODO: install tmux from source
 
@@ -65,6 +65,7 @@ backupIfNotSymlink ~/.template.html
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
 git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
+git clone https://github.com/jonmosco/kube-ps1.git ~/.kube-ps1
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 curl -fLo ~/.z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
 
