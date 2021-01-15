@@ -1,15 +1,17 @@
 #!/bin/bash
 
-# Install dependencies
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux node ag neovim
-
-# TODO: install tmux from source
-
 #get the directly of where this script is run, and consequently where the files are located
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 
 SYSTEM=${OSTYPE//[0-9.]/}
+
+# Install dependencies
+if [[ $SYSTEM == "darwin" ]]; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux node ag neovim
+fi
+
+# TODO: install tmux from source
 
 #warn if they already have one of the .bak files that exists
 if [[  -e ~/.tmux.conf.bak || -e ~/.tmux.reset.conf.bak \
@@ -97,4 +99,4 @@ touch ~/.vimrc.local
 
 vim +PlugClean +PlugUpdate +qall
 
-python ~/.vim/plugged/YouCompleteMe/install.py
+#python3 ~/.vim/plugged/YouCompleteMe/install.py
