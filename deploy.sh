@@ -70,6 +70,7 @@ git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
 git clone https://github.com/jonmosco/kube-ps1.git ~/.kube-ps1
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 curl -fLo ~/.z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
+curl -fLo ~/.kubectl_aliases https://raw.githubusercontent.com/ahmetb/kubectl-alias/master/.kubectl_aliases
 
 #make the new symlinks
 ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf

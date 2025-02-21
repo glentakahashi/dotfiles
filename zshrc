@@ -1,6 +1,10 @@
 #zmodload zsh/zprof
 source /etc/profile
+
+# kube-ps1
 source ~/.kube-ps1/kube-ps1.sh
+export KUBE_PS1_NS_ENABLE=false
+export KUBE_PS1_SYMBOL_ENABLE=false
 
 # oh-my-zsh options
 ZSH=~/.oh-my-zsh
@@ -59,7 +63,7 @@ KEYTIMEOUT=100
 alias reload-zshrc='exec zsh'
 alias grip='grep -riI'
 #simple http server
-alias http='python -m SimpleHTTPServer'
+alias http='python3 -m http.server'
 #most common commands - useful for determining what else i should alias to save time
 alias mosthist="cat ~/.zsh_history | sed -E -n 's/.*;([^ ]*)( ?.*)/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
 alias mosthist2="cat ~/.zsh_history | sed -E -n 's/.*;([^ ]* ?[^ ]*)( ?.*)/\1/p' | sort | uniq -c | awk '\$1 > 10' | sort -n"
@@ -142,6 +146,8 @@ source ~/.z.sh
 #fzf aliases
 source ~/.zshrc.fzf
 
+[ -f ~/.kubectl_aliases ] && source ~/.kubectl_aliases
+
 # load system specific overrides
 source ~/.zshrc.system
 
@@ -162,3 +168,6 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # krew path
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+export AWS_PAGER=""
+export PATH="/Users/glen/projects/hex/bin:$PATH"

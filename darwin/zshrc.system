@@ -3,8 +3,8 @@
 #java
 export JAVA_HOME=`/usr/libexec/java_home`
 
-export PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/sbin:/usr/bin:~/bin:/usr/local/lib64:$PATH
-export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
+export PATH=/opt/homebrew/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/sbin:/usr/bin:~/bin:/usr/local/lib64:$PATH
+export MANPATH="/opt/homebrew/opt/coreutils/libexec/gnuman:$MANPATH"
 
 #mac needs overrides to use colors
 test -e ~/.dircolors && eval `dircolors -b ~/.dircolors`
