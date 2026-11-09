@@ -8,6 +8,10 @@
 # - git info comes from one `git status --porcelain=v2` call instead of
 #   vcs_info + parse_git_dirty (2-3 git calls), and only once per prompt:
 #   switching vi modes no longer re-runs git.
+# - that call runs in the background: the prompt draws immediately and the git
+#   segment fills in when it's done (~20-50ms in a big repo like hex). In the
+#   same directory the previous git info shows until then, so nothing flickers.
+#   PROMPT_GIT_SYNC=1 in ~/.zshrc.local turns this off.
 # - dir truncation and the clock are pure zsh (no pwd/awk/tput/date forks).
 
 setopt prompt_subst
@@ -116,7 +120,9 @@ prompt_dir() {
   prompt_segment blue $CURRENT_FG "${p//\%/%%}"
 }
 
-prompt_git() {
+# Prints "dirty|<text>" or "clean|<text>" for the current repo, nothing outside
+# one. Runs in a background subshell (see _prompt_git_start).
+_prompt_git_compute() {
   (( $+commands[git] )) || return
   local line head oid staged= unstaged= mode= gitdir
   local -a out
@@ -134,11 +140,6 @@ prompt_git() {
       [u?]' '*) unstaged='●' ;;
     esac
   done
-  if [[ -n $staged$unstaged ]]; then
-    prompt_segment yellow black
-  else
-    prompt_segment green $CURRENT_FG
-  fi
   gitdir=$(git rev-parse --git-dir 2>/dev/null)
   if   [[ -e $gitdir/BISECT_LOG ]]; then mode=" <B>"
   elif [[ -e $gitdir/MERGE_HEAD ]]; then mode=" >M<"
@@ -150,7 +151,48 @@ prompt_git() {
     head="$PL_BRANCH_CHAR $head"
   fi
   local flags=$unstaged$staged
-  print -nr -- "${head//\%/%%}${flags:+ $flags}$mode"
+  print -r -- "${${flags:+dirty}:-clean}|${head//\%/%%}${flags:+ $flags}$mode"
+}
+
+# the git segment, from the last result for this directory
+prompt_git() {
+  [[ -n $_prompt_git_info && $_prompt_git_pwd == $PWD ]] || return
+  if [[ $_prompt_git_info == dirty\|* ]]; then
+    prompt_segment yellow black
+  else
+    prompt_segment green $CURRENT_FG
+  fi
+  print -nr -- "${_prompt_git_info#*|}"
+}
+
+# start git in the background; _prompt_git_done redraws when it finishes
+_prompt_git_start() {
+  # (exec {var} makes var an integer, so "no run" is unset, not empty/0)
+  if (( ${+_prompt_git_fd} )); then    # previous run still going: drop it
+    zle -F $_prompt_git_fd 2>/dev/null
+    exec {_prompt_git_fd}<&-
+    unset _prompt_git_fd
+  fi
+  if [[ -n $PROMPT_GIT_SYNC ]] || ! zle -F 2>/dev/null >&2 </dev/null; then
+    _prompt_git_info=$(_prompt_git_compute) _prompt_git_pwd=$PWD
+    return
+  fi
+  # a different directory's info would be wrong here; same dir: keep showing it
+  [[ $_prompt_git_pwd != $PWD ]] && _prompt_git_info= _prompt_git_pwd=$PWD
+  exec {_prompt_git_fd}< <(_prompt_git_compute)
+  zle -F $_prompt_git_fd _prompt_git_done
+}
+
+_prompt_git_done() {
+  local fd=$1 info=
+  [[ -z $2 ]] && IFS= read -r -u $fd info
+  zle -F $fd
+  exec {fd}<&-
+  unset _prompt_git_fd
+  [[ $info == $_prompt_git_info ]] && return   # unchanged: skip the redraw
+  _prompt_git_info=$info
+  _prompt_top=$(_prompt_build_top)
+  zle reset-prompt
 }
 
 _prompt_build_top() {
@@ -179,7 +221,7 @@ _prompt_build_mode() {
 # and build the prompt after the others (direnv may change the environment).
 # Order is enforced by prompt_fix_hook_order, called at the end of zshrc.
 _prompt_save_status() { _prompt_retval=$? }
-_prompt_precmd()      { _prompt_kube_update; _prompt_top=$(_prompt_build_top) }
+_prompt_precmd()      { _prompt_kube_update; _prompt_git_start; _prompt_top=$(_prompt_build_top) }
 prompt_fix_hook_order() {
   precmd_functions=(_prompt_save_status
     ${precmd_functions:#(_prompt_save_status|_prompt_precmd)} _prompt_precmd)
