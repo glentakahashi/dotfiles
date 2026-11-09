@@ -1,22 +1,23 @@
 #Mac specific overrides
 
-#java
-export JAVA_HOME=`/usr/libexec/java_home`
+#java (skip if no JDK is installed; java_home prints an error otherwise)
+JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null) && export JAVA_HOME || unset JAVA_HOME
 
 export PATH=/opt/homebrew/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:/usr/local/bin:/usr/local/sbin:/usr/bin:~/bin:/usr/local/lib64:$PATH
 export MANPATH="/opt/homebrew/opt/coreutils/libexec/gnuman:$MANPATH"
 
 #mac needs overrides to use colors
+# `auto`, not `always`: always leaks escape codes into pipes (`grep x | xargs ...`)
 test -e ~/.dircolors && eval `dircolors -b ~/.dircolors`
-alias ls="ls --color=always" 
-alias grep="grep --color=always"
-alias egrep="egrep --color=always"
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias egrep="grep -E --color=auto"
 
 #fix for sed for mac
 #we cannot export those because it screws over terminal encoding
 alias sed="LC_ALL=C sed"
 function copy() {
-  cat $1 | pbcopy
+  cat "${@:--}" | pbcopy
 }
 
 function giffy() {
