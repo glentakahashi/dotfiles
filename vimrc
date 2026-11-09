@@ -434,8 +434,7 @@ map gj L
 map gl g$
 map gh g0
 
-" fzf
-set rtp+=/usr/local/opt/fzf
+" fzf: loaded via vimplug
 
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()

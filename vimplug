@@ -32,7 +32,13 @@ Plug 'terryma/vim-multiple-cursors'
 
 "searching
 Plug 'junegunn/vim-slash'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+" fzf's vim plugin ships with the binary. Use brew's; the old
+" `'do': './install --all'` hook rewrote ~/.zshrc and ~/.bashrc on every update.
+if isdirectory('/opt/homebrew/opt/fzf')
+  Plug '/opt/homebrew/opt/fzf'
+else
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+endif
 
 "buffers
 Plug 'junegunn/vim-peekaboo'
