@@ -26,9 +26,14 @@ set autochdir
 "allow buffers to be moved off of if they have changes
 set hidden
 
-"easily close buffer without closing window
-map <leader>d :Bclose<CR>
-map <leader>D :Bclose!<CR>
+"easily close buffer without closing window (replaces the bclose.vim plugin)
+function! s:BufClose(bang) abort
+  let l:buf = bufnr('%')
+  if len(getbufinfo({'buflisted': 1})) > 1 | bprevious | else | enew | endif
+  execute 'silent! bdelete' . a:bang l:buf
+endfunction
+nnoremap <silent> <leader>d :call <SID>BufClose('')<CR>
+nnoremap <silent> <leader>D :call <SID>BufClose('!')<CR>
 
 syntax on
 
@@ -71,8 +76,11 @@ set shortmess+=filmnrxoOtT          " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set virtualedit=onemore             " Allow for cursor beyond last character
 set history=1000                    " Store a ton of history (default is 20)
-"TODO: actually utilize this
-set spell                           " Spell checking on
+" spell check prose only (in code it flags every identifier). ]s/[s jump, z= fixes
+augroup spell_prose
+  autocmd!
+  autocmd FileType markdown,gitcommit,text,rst setlocal spell
+augroup END
 
 set backup                  " Backups are nice ...
 if has('persistent_undo')
@@ -99,21 +107,10 @@ set tabpagemax=15               " Only show 15 tabs
 set showmode                    " Display the current mode
 set cursorline                  " Highlight current line
 
-"TODO: this doesn't work
-if has('statusline')
-  set laststatus=2
-
-  " Broken down into easily includeable segments
-  set statusline=%<%f\                     " Filename
-  set statusline+=%w%h%m%r                 " Options
-  set statusline+=%{fugitive#statusline()} " Git Hotness
-  set statusline+=\ [%{&ff}/%Y]            " Filetype
-  set statusline+=\ [%{getcwd()}]          " Current dir
-  set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
-
-  let g:airline_theme='powerlineish'       " airline users use the powerline theme
-  let g:airline_powerline_fonts=1          " and the powerline fonts
-endif
+" statusline comes from vim-airline
+set laststatus=2
+let g:airline_theme='powerlineish'
+let g:airline_powerline_fonts=1
 
 " indent_guides {
 let g:indent_guides_auto_colors = 1
@@ -122,7 +119,6 @@ let g:indent_guides_guide_size = 1
 let g:indent_guides_enable_on_vim_startup = 1
 " }
 
-let g:neocomplete#enable_at_startup = 1
 
 " Initialize directories {
 function! InitializeDirectories()
@@ -187,25 +183,26 @@ set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic white
 
 set nowrap                      " Don't wrap long lines
 set autoindent                  " Indent at the same level of the previous line
-"todo, make this dependent on file
-"set shiftwidth=4                " Use indents of 4 spaces
-"set expandtab                   " Tabs are spaces, not tabs
-"set tabstop=4                   " An indentation every four columns
-"set softtabstop=4               " Let backspace delete indent
+
+" Indentation. vim-sleuth sets it per buffer from the file itself (or from a
+" project's .editorconfig, which it reads), so these only apply to new/empty
+" files.
+set expandtab shiftwidth=2 softtabstop=-1 shiftround
+augroup indent_defaults
+  autocmd!
+  autocmd FileType python,rust,java,kotlin,scala,c,cpp,cs,php,swift,sql setlocal shiftwidth=4
+  autocmd FileType go,make,gitconfig setlocal noexpandtab tabstop=4 shiftwidth=0
+augroup END
 
 " Remove trailing whitespaces and ^M chars
 autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown
 map <leader>c :call StripTrailingWhitespace()<CR>
 
-"new tab
-"map <silent> <C-t>n :tabe<CR>
-
-
-" open window in a new tab instead
-"map <silent> <C-w>t :tabedit %<CR> TODO:
-nnoremap <silent> <C-o> :bn<CR>
-nnoremap <silent> <C-i> :bp<CR>
+" next/previous buffer. (C-o / C-i are vim's jumplist: C-o goes back to where
+" you were before a jump like gg, /search, gd or :tag; C-i goes forward again.)
+nnoremap <silent> ]b :bnext<CR>
+nnoremap <silent> [b :bprevious<CR>
 
 " Enable the list of buffers
 let g:airline#extensions#tabline#enabled = 1
@@ -218,47 +215,6 @@ let g:airline_section_c = "%F"
 "create splits using C+w+- and C+w+|
 map <silent> <C-w>- :sp<CR>
 map <silent> <C-w>\| :vsp<CR>
-
-"TODO: make into buffermove
-"Move tabs using Ctrl + h or Ctrl + l
-"map <silent> <C-w>h :execute "tabmove" tabpagenr() - 2 <CR>
-"map <silent> <C-w>l :execute "tabmove" tabpagenr() <CR>
-
-""""" FZF stuff """""
-"TODO: make this work...
-nnoremap <silent> <C-p> :FZF -m<CR>
-command! FZFMru call fzf#run({
-\ 'source':  reverse(s:all_files()),
-\ 'sink':    'edit',
-\ 'options': '-m -x +s',
-\ 'down':    '40%' })
-
-function! s:all_files()
-  return extend(
-  \ filter(copy(v:oldfiles),
-  \        "v:val !~ 'fugitive:\\|NERD_tree\\|^/tmp/\\|.git/'"),
-  \ map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), 'bufname(v:val)'))
-endfunction
-
-nnoremap <silent> <Leader>o :FZFMru <CR>
-
-function! s:buflist()
-  redir => ls
-  silent ls
-  redir END
-  return split(ls, '\n')
-endfunction
-
-function! s:bufopen(e)
-  execute 'buffer' matchstr(a:e, '^[ 0-9]*')
-endfunction
-
-nnoremap <silent> ; :call fzf#run({
-\   'source':  reverse(<sid>buflist()),
-\   'sink':    function('<sid>bufopen'),
-\   'options': '+m',
-\   'down':    len(<sid>buflist()) + 2
-\ })<CR>
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
 noremap j gj
@@ -288,11 +244,11 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Fugitive {
-nnoremap <silent> <leader>gs :Gstatus<CR>
-nnoremap <silent> <leader>gd :Gdiff<CR>
-nnoremap <silent> <leader>gc :Gcommit<CR>
-nnoremap <silent> <leader>gb :Gblame<CR>
-nnoremap <silent> <leader>gl :Glog<CR>
+nnoremap <silent> <leader>gs :Git<CR>
+nnoremap <silent> <leader>gd :Gdiffsplit<CR>
+nnoremap <silent> <leader>gc :Git commit<CR>
+nnoremap <silent> <leader>gb :Git blame<CR>
+nnoremap <silent> <leader>gl :Gclog<CR>
 nnoremap <silent> <leader>gp :Git push<CR>
 nnoremap <silent> <leader>gw :Gwrite<CR>:GitGutter<CR>
 nnoremap <silent> <leader>gg :GitGutterToggle<CR>
@@ -374,8 +330,8 @@ inoremap kj <Esc>
 noremap <leader>rw vep
 noremap <leader>ry Vp
 
-"open in vscode at same spot
-noremap <leader>vs :silent exec "! code --goto " . expand('%:p') . ':' . line(".") . ':' . col(".")<CR>
+"open in Cursor at the same spot
+noremap <leader>vs :silent exec "! cursor --goto " . expand('%:p') . ':' . line(".") . ':' . col(".")<CR>
 
 " Easier horizontal scrolling
 map zl zL
@@ -398,8 +354,6 @@ map gj L
 " right left
 map gl g$
 map gh g0
-
-" fzf: loaded via vimplug
 
 "create the .vimbak .vimswap .vimhist directories
 call InitializeDirectories()
