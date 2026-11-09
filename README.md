@@ -1,112 +1,52 @@
 # glen's dotfiles
-A collection of my dotfiles with an included deploy script to completely replace (with backups of course) all vim, zsh, tmux configurations.
-I recommend that you do not blindly run the script and instead pick out the bits and pieces that you find useful.
-Especially because the gitconfig file contains references to my own username, email, and name. Everything else should be user-agnostic.
 
-I (think) it depends on solarized colorscheme and powerline fonts in your terminal or everything will look like shit.
+zsh (vi mode, agnoster-style powerline prompt, fzf everywhere), tmux, vim,
+git, iTerm2 and Cursor config for macOS (with a Linux fallback).
 
-TODO:
-* Make update script
+`gitconfig` has my name/email, so pick pieces out rather than running
+`deploy.sh` blindly.
 
-* Make environment/zsh/bashrc/profile all consistent
-* multiple tmux sessions, selector (windows)
-* use windows as different workspaces, sessions as different projects
-* add fugitive, syntastic to numbers_exclude
-* fix weird loclist issues with syntastic
-* add check for bufferclose to safely close fugitive windows and oher windows
+## Install / update
 
-* switch newline prompt to be the right and left unicode/emoji arrows, colorize for vim mode
-* colorize username + computer in prompt
+```sh
+git clone git@github.com:glentakahashi/dotfiles.git ~/projects/dotfiles
+~/projects/dotfiles/deploy.sh            # --no-brew / --no-vim to skip steps
+```
 
-* remove dependencies on oh my zsh
-* add in .profile .bash_profile and .zsh_profile
-* get better buffer navigator
-* learn how to use fugitive
-* add sshconfig in maybe??? (definitely insecure)
-* make deploy script fail unless you are me! (i suggest people don't run it naked)
-  * or ask questions and make a better spf13
-* folding and shit
-* move buffers around (ctrl+p for buffers or something)
-* SURROUND
-* Split vimrc into mutliple files based on plugin they're for?
+`deploy.sh` is idempotent, so re-run it whenever. It:
 
-Some plugins to add:
-* vim-view maybe
-http://vimcasts.org/episodes/aligning-text-with-tabular-vim/
-vim-csv
-https://github.com/junegunn/vim-easy-align
-https://github.com/junegunn/vim-peekaboo
-https://github.com/junegunn/vim-fnr
-https://github.com/junegunn/mvmv
-https://github.com/ggVGc/fzf_browser
-https://stackoverflow.com/questions/26554713/how-to-truncate-working-directory-in-prompt-to-show-first-and-last-folder
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-#add gem scripts
-seoul256.vim 
+- installs/upgrades packages from `Brewfile` (fzf, ripgrep, fd, bat, zoxide, tmux, the Meslo powerline font, iTerm2...)
+- symlinks the dotfiles into `~` (real files get backed up to `*.bak.<timestamp>`)
+- makes `~/.gitconfig` include `gitconfig` (machine-specific git settings stay in `~/.gitconfig`)
+- clones/updates zsh plugins into `~/.local/share/zsh/plugins`, plus kube-ps1, dircolors-solarized, tpm and vim plugins
+- installs the iTerm2 profile (`darwin/iterm/Dotfiles.json`: Solarized Dark, Meslo LG S DZ for Powerline 10pt, Option = Esc+) and makes it the default
+- links Cursor settings/keybindings and installs extensions from `cursor/extensions.list`
 
-git-flow
+Machine-local, untracked overrides: `~/.zshrc.local`, `~/.tmux.local.conf`, `~/.vimrc.local`.
 
-https://github.com/haya14busa/vim-easyoperator-line
-https://github.com/takac/vim-hardtime
-https://github.com/justinmk/vim-sneak
+## Layout
 
-antigen - zsh plugin manager
-or better yet, a simple script that you specify a repo a branch and a relatilve file path and it will clone and source the file
-git@github.com:atweiden/fzf-extras.git
+| file | what |
+|---|---|
+| `zshrc` | loader: options, completion, vi keys, aliases, tools, plugins |
+| `zsh/options.zsh` | history (500k, secrets filtered out), dirs, terminal title |
+| `zsh/completion.zsh` | cached compinit + fzf-tab |
+| `zsh/prompt.zsh` | agnoster-style prompt (kube ctx, AWS profile, git, vi mode) |
+| `zsh/git.zsh` | git aliases (run `galias` to list them) |
+| `zshrc.fzf` | fzf config + pickers (run `fzf-help`) |
+| `darwin/`, `linux-gnu/` | per-OS zsh/tmux overrides |
+| `Brewfile` | packages |
+| `cursor/` | Cursor settings, keybindings, extensions (`cursor/extensions.sh export` after adding some) |
 
-make sure you install vim with --with-lua
-brew install vim --with-lua
+## Cheat sheet
 
-youcompleteme, clang, xbuild(mono), etc.
-dependencies: go, rust, mono, clang, cmake
-go,rust,mono,cmake are from homebre
-install clang by typing clang and using the UI
-https://github.com/Valloric/YouCompleteMe
+- `galias`: git aliases. You'll also get a hint after typing a long command that has an alias (zsh-you-should-use).
+- `fzf-help`: fzf functions. Most used: `fco` (branch), `gfv`/`frg` (grep → vim), `fga` (stage files), `fkx`/`fkl` (pod shell/logs), `fport`.
+- `ctrl-g ctrl-b` / `ctrl-h` / `ctrl-f` / `ctrl-s` / `ctrl-t`: insert branch / commit / changed file / stash / tag at the cursor.
+- `ctrl-r` history, `ctrl-t` files, `alt-c` cd, `alt-u` cd to a parent, `<tab>` fzf completion menu, `j` zoxide picker.
+- `kj` leaves insert mode; `v` in normal mode edits the line in vim.
 
-fish is a pretty awesome shell
-learn from fish
+## Profiling startup
 
-# Dependencies
-
-* All
-  * Vim with lua, clipboard
-  * fzf
-  * git
-  * ag
-* Optional
-  * mono
-  * go
-  * typescript
-  * clang
-  * rust
-* Mac
-  * homebrew
-  * homebrew-coreutils
-
-## vimplug
-
-vim-oblique overrides the following keys by default:
-
-| Default Key | `<Plug>` map           | Description                                      |
-| ----------- | -------------------- | ------------------------------------------------ |
-| `/`         | `<Plug>(Oblique-/)`  | Forward search                                   |
-| `?`         | `<Plug>(Oblique-?)`  | Backward search                                  |
-| `z/`        | `<Plug>(Oblique-F/)` | Forward fuzzy-search                             |
-| `z?`        | `<Plug>(Oblique-F?)` | Backward fuzzy-search                            |
-| `n`         | `<Plug>(Oblique-n)`  | Repeat the last search                           |
-| `N`         | `<Plug>(Oblique-N)`  | Repeat the last search in the opposite direction |
-| `*`         | `<Plug>(Oblique-*)`  | Forward star-search (in normal and visual mode)  |
-| `#`         | `<Plug>(Oblique-#)`  | Backward star-search (in normal and visual mode) |
-| `g*`        | `<Plug>(Oblique-g*)` | Forward star-search (no word boundary match)     |
-| `g#`        | `<Plug>(Oblique-g#)` | Backward star-search (no word boundary match)    |
-
-## fzf
-
-| Token    | Match type           | Description                      |
-| -------- | -------------------- | -------------------------------- |
-| `sbtrkt` | fuzzy-match          | Items that match `sbtrkt`        |
-| `^music` | prefix-exact-match   | Items that start with `music`    |
-| `.mp3$`  | suffix-exact-match   | Items that end with `.mp3`       |
-| `'wild`  | exact-match (quoted) | Items that include `wild`        |
-| `!rmx`   | inverse-fuzzy-match  | Items that do not match `rmx`    |
-| `!'fire` | inverse-exact-match  | Items that do not include `fire` |
+Uncomment `zmodload zsh/zprof` at the top of `zshrc` and `zprof` at the bottom,
+or just `time zsh -i -c exit`.
