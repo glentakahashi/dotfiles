@@ -1,200 +1,424 @@
-if [[ $- =~ i ]]; then
+# fzf config, functions and widgets.
+# Everything degrades gracefully: fd/bat are used when installed, rg/cat otherwise.
+#
+# Quick reference (run `fzf-help` for this list):
+#   files/search   fe fo fcd fvim gfv frg            ctrl-t alt-c alt-u **<tab>
+#   history        ctrl-r / alt-r (ctrl-y copies)
+#   git            fco fcoa fbr fcoc fshow fga fgap fgd fstash fpr
+#                  ctrl-g ctrl-b/h/f/s/t: insert branch/hash/file/stash/tag at cursor
+#   k8s            fkx fkl fkd fke fkrr fhh
+#   docker         fdbash fdlogs fdstop fdcl
+#   misc           fkill fport fsc fnr fs j
 
-  export FZF_DEFAULT_OPTS='--height 40% --layout=reverse'
+[[ $- == *i* ]] || return 0
 
-  fvim() {
-    local files file
-    files=$(ag -p ~/.agignore -g "") &&
-    file=$(echo "$files" | fzf) &&
-    vim $file
-  }
-
-  fzf-cd-up() {
-    local declare dirs=()
-    get_parent_dirs() {
-      dirs+=("$1")
-      if [[ ${1} == '/' ]]; then
-        for _dir in ${dirs[@]}; do
-          echo $_dir
-        done
-      else
-        get_parent_dirs "$(dirname $1)"
-      fi
-    }
-    DIR=$(get_parent_dirs "$(pwd)" | fzf) && cd "$DIR"
-    zle reset-prompt
-  }
-
-  zle     -N    fzf-cd-up
-  bindkey '\eu' fzf-cd-up
-
-  gfv() {
-    local line
-    P=${1:-".*"}
-    line=($(ag --noheading -G $P . | awk -F':' '{s = "\x1b[31;1m" $1 "\x1b[m:" $2 "\t"; for (i = 3; i <= NF; i++) s = s $i; print s; }' | fzf --ansi -d ":" -n 2)) &&
-    f=($(echo $line | awk -F':' '{print $1;}')) &&
-    line_num=($(echo $line | awk -F':' '{print $2;}' | awk -F' ' '{print $1;}')) &&
-    vim +${line_num} "${f}"
-  }
-
-  # fco - checkout LOCAL git branch/tag
-  fco() {
-    local tags branches target
-    tags=$(git tag --sort=-committerdate | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
-    branches=$(
-      git branch --sort=-committerdate | grep -v HEAD             |
-      sed "s/.* //"                          | sed "s#remotes/[^/]*/##" |
-      awk '!x[$0]++'                         | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
-    target=$(
-      (echo "$branches"; echo "$tags") |
-      fzf --no-hscroll --ansi +m -d "\t" -n 2) || return
-    git checkout $(echo "$target" | awk '{print $2}')
-  }
-
-  # fcoa - checkout remote git branches/tags
-  fcoa() {
-    local tags branches target
-    tags=$(git tag --sort=-committerdate | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}') || return
-    branches=$(
-      git branch --all --sort=-committerdate | grep -v HEAD             |
-      sed "s/.* //"                          | sed "s#remotes/[^/]*/##" |
-      awk '!x[$0]++'                         | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}') || return
-    target=$(
-      (echo "$branches"; echo "$tags") |
-      fzf --no-hscroll --ansi +m -d "\t" -n 2) || return
-    git checkout $(echo "$target" | awk '{print $2}')
-  }
-
-  # fcoc - checkout git commit
-  fcoc() {
-    local commits commit
-    commits=$(git log --pretty=format:"%h - %an, %ar : %s" --abbrev-commit --reverse) &&
-    commit=$(echo "$commits" | fzf --tac +s +m -e) &&
-    git checkout $(echo "$commit" | sed "s/ .*//")
-  }
-
-  # fshow - git commit browser
-  fshow() {
-    git log --graph --color=always \
-        --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-    fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
-        --bind "ctrl-m:execute:
-                  (grep -o '[a-f0-9]\{7\}' | head -1 |
-                  xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
-                  {}
-  FZF-EOF"
-  }
-
-  # fs [FUZZY PATTERN] - Select selected tmux session
-  #   - Bypass fuzzy finder if there's only one match (--select-1)
-  #   - Exit if there's no match (--exit-0)
-  fs() {
-    local session
-    session=$(tmux list-sessions -F "#{session_name}" | \
-      fzf --query="$1" --select-1 --exit-0) &&
-    tmux switch-client -t "$session"
-  }
-
-  # fbr - checkout git branch (including remote branches)
-  fbr() {
-    local branches branch
-    branches=$(git branch --all | grep -v HEAD) &&
-    branch=$(echo "$branches" |
-             fzf -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
-    git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
-  }
-
-  # ALT-I - Paste the selected entry from locate output into the command line
-  fzf-locate-widget() {
-    local selected
-    if selected=$(locate / | fzf); then
-      LBUFFER=$LBUFFER$selected
-    fi
-    zle redisplay
-  }
-  zle     -N    fzf-locate-widget
-  bindkey '\ei' fzf-locate-widget
-
-  # fe [FUZZY PATTERN] - Open the selected file with the default editor
-  #   - Bypass fuzzy finder if there's only one match (--select-1)
-  #   - Exit if there's no match (--exit-0)
-  fe() {
-    IFS='
-  '
-    local declare files=($(fzf --query="$1" --select-1 --exit-0))
-    [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
-    unset IFS
-  }
-
-  # Modified version where you can press
-  #   - CTRL-O to open with `open` command,
-  #   - CTRL-E or Enter key to open with the $EDITOR
-  fo() {
-    local out file key
-    out=$(fzf --query="$1" --exit-0)
-    key=$(head -1 <<< "$out")
-    file=$(head -2 <<< "$out" | tail -1)
-    if [ -n "$file" ]; then
-      open "$file"
-    fi
-  }
-
-  # cdf - cd into the directory of the selected file
-  fcd() {
-     local file
-     local dir
-     file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
-  }
-
-  # fkill - kill process
-  fkill() {
-    pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
-
-    if [ "x$pid" != "x" ]
-    then
-      kill -${1:-9} $pid
-    fi
-  }
-
-  _getDockerContainer() {
-    echo $(docker ps | sed 1d | sed -E 's/ +/ /g' | cut -d' ' -f1,2 | awk -F' ' '{print "\x1b[31;1m" $1 "\x1b[m: " $2;}' | fzf --ansi -d ' ' -n 2 | awk -F':' '{print $1}')
-  }
-
-  # fdbash - open bash for a docker
-  fdbash() {
-    cid=$(_getDockerContainer)
-
-    if [ "x$cid" != "x" ]
-    then
-      docker exec -it $cid bash
-    fi
-  }
-
-  # fdlogs - get docker logs
-  fdlogs() {
-    cid=$(_getDockerContainer)
-
-    if [ "x$cid" != "x" ]
-    then
-      docker logs $cid
-    fi
-  }
-
-  # fdstop  - docker kill
-  fdstop() {
-    cid=$(_getDockerContainer)
-
-    if [ "x$cid" != "x" ]
-    then
-      docker stop $cid
-    fi
-  }
-
-  j() {
-    if [[ -z "$*" ]]; then
-      cd "$(_z -l 2>&1 | fzf +s --tac | sed 's/^[0-9,.]* *//')"
-    else
-      _z "$@"
-    fi
-  }
+# --------------------------------------------------------------------------
+# Defaults
+# --------------------------------------------------------------------------
+if (( $+commands[bat] )); then
+  _fzf_cat='bat --color=always --style=numbers --line-range=:500'
+else
+  _fzf_cat='head -500'
 fi
+# file preview that also handles directories
+_fzf_preview="[[ -d {} ]] && ls -la --color=always {} || $_fzf_cat {}"
+# grep-result preview: {1}=file {2}=line, highlight the matching line
+if (( $+commands[bat] )); then
+  _fzf_preview_line='bat --color=always --style=numbers --highlight-line {2} {1}'
+else
+  _fzf_preview_line='awk -v l={2} '\''{printf "%s%5d  %s\033[0m\n", (NR==l ? "\033[1;30;43m" : ""), NR, $0}'\'' {1}'
+fi
+_fzf_copy=${${commands[pbcopy]:+pbcopy}:-xclip -selection clipboard}
+
+if (( $+commands[fd] )); then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules'
+  _fzf_compgen_path() { fd --hidden --follow --exclude .git . "$1" }
+  _fzf_compgen_dir()  { fd --type d --hidden --follow --exclude .git . "$1" }
+elif (( $+commands[rg] )); then
+  # respects .gitignore, so node_modules/build output stay out of the list
+  export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
+  _fzf_compgen_path() { rg --files --hidden --glob '!.git' "$1" 2>/dev/null }
+elif (( $+commands[ag] )); then
+  export FZF_DEFAULT_COMMAND='ag -p ~/.agignore -g ""'
+  _fzf_compgen_path() { ag -p ~/.agignore -g "" "$1" 2>/dev/null }
+fi
+
+# line-oriented grep used by gfv/frg: prints file:line:text (rg preferred, ag fallback)
+if (( $+commands[rg] )); then
+  _fzf_grep='rg --line-number --no-heading --color=always --smart-case'
+  _fzf_grep_pathargs() { reply=(--glob "*$1*") }
+else
+  _fzf_grep="ag --nogroup --numbers --color --color-match 0 --smart-case -p $HOME/.agignore"
+  _fzf_grep_pathargs() { reply=(-G "$1") }
+fi
+export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
+
+export FZF_DEFAULT_OPTS="--height 50% --layout=reverse --border --info=inline-right --cycle
+  --bind 'ctrl-/:toggle-preview,alt-j:preview-down,alt-k:preview-up,alt-a:toggle-all'"
+export FZF_CTRL_T_OPTS="--preview '$_fzf_preview' --preview-window 'right,55%,<100(down,50%)'"
+export FZF_ALT_C_OPTS="--preview 'ls -la --color=always {}'"
+export FZF_CTRL_R_OPTS="--bind 'ctrl-y:execute-silent(echo -n {2..} | $_fzf_copy)+abort'
+  --header 'ctrl-y: copy to clipboard'"
+
+fzf-help() { sed -n '5,12p' ~/.zshrc.fzf }
+
+# --------------------------------------------------------------------------
+# Files & search
+# --------------------------------------------------------------------------
+
+# fe [query] - open file(s) in $EDITOR (auto-selects on a single match)
+fe() {
+  local -a files=("${(@f)$(fzf -m --query="$1" --select-1 --exit-0 --preview "$_fzf_preview")}")
+  [[ -n $files ]] && ${EDITOR:-vim} -- "${files[@]}"
+}
+alias fvim=fe
+
+# fo [query] - open file with `open` (enter) or $EDITOR (ctrl-e)
+fo() {
+  local out key file
+  out=$(fzf --query="$1" --exit-0 --expect=ctrl-e --preview "$_fzf_preview" --header 'enter: open · ctrl-e: edit') || return
+  key=${out%%$'\n'*}; file=${out#*$'\n'}
+  [[ -z $file ]] && return
+  if [[ $key == ctrl-e ]]; then ${EDITOR:-vim} -- "$file"; else open "$file"; fi
+}
+
+# fcd [query] - cd into the directory of the selected file
+fcd() {
+  local file
+  file=$(fzf +m -q "$1" --preview "$_fzf_preview") && cd -- "${file:h}"
+}
+
+# gfv [path-pattern] - fuzzy search every line in the repo, open vim at that line
+#   gfv            all files
+#   gfv .ts        only paths containing ".ts"
+gfv() {
+  local sel reply
+  local -a cmd=(${(z)_fzf_grep})
+  [[ -n $1 ]] && { _fzf_grep_pathargs "$1"; cmd+=($reply) }
+  sel=$("${cmd[@]}" . |
+    fzf --ansi --delimiter : --nth 3.. \
+        --preview "$_fzf_preview_line" --preview-window 'right,60%,+{2}/2') || return
+  vim "+${${sel#*:}%%:*}" -- "${sel%%:*}"
+}
+
+# frg [query] - live grep: each keystroke re-runs rg/ag (fast in big repos);
+#   ctrl-f switches to fuzzy-filtering the current results. Enter opens vim.
+frg() {
+  local rg=$_fzf_grep
+  local sel
+  sel=$(: | fzf --ansi --disabled --query "$1" \
+      --bind "start:reload:$rg {q} || true" \
+      --bind "change:reload:sleep 0.1; $rg {q} || true" \
+      --bind 'ctrl-f:unbind(change)+change-prompt(fzf> )+enable-search+clear-query' \
+      --prompt 'grep> ' --delimiter : \
+      --header 'ctrl-f: fuzzy filter results' \
+      --preview "$_fzf_preview_line" --preview-window 'right,60%,+{2}/2') || return
+  vim "+${${sel#*:}%%:*}" -- "${sel%%:*}"
+}
+
+# alt-u - cd to a parent directory
+fzf-cd-up() {
+  local d=$PWD
+  local -a dirs
+  while [[ $d != / ]]; do d=${d:h}; dirs+=($d); done
+  local sel
+  sel=$(printf '%s\n' $dirs | fzf --no-sort --preview 'ls -la --color=always {}') && cd -- "$sel"
+  zle && zle reset-prompt
+}
+zle -N fzf-cd-up
+
+# j [query] - jump with z; no args = pick from frecent dirs
+j() {
+  if [[ -z "$*" ]]; then
+    local dir
+    dir=$(_z -l 2>&1 | fzf +s --tac --preview 'ls -la --color=always {2..}' | sed 's/^[0-9,.]* *//') && cd -- "$dir"
+  else
+    _z "$@"
+  fi
+}
+
+# --------------------------------------------------------------------------
+# Git
+# --------------------------------------------------------------------------
+_fzf_in_git() { git rev-parse --git-dir >/dev/null 2>&1 || { echo "not a git repo" >&2; return 1 } }
+
+_fzf_git_log_preview='git log --oneline --graph --color=always --date=short --format="%C(auto)%h %C(blue)%ad%C(auto)%d %s %C(black)%C(bold)%an" -40'
+
+# shared picker for fco / fcoa
+_fzf_checkout() {
+  local all=$1 tags branches target
+  _fzf_in_git || return
+  tags=$(git tag --sort=-committerdate | awk '{print "\x1b[31;1mtag\x1b[m\t" $1}')
+  branches=$(
+    git branch $all --sort=-committerdate | grep -v HEAD |
+    sed "s/.* //" | sed "s#remotes/[^/]*/##" |
+    awk '!x[$0]++' | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}')
+  target=$(
+    (echo "$branches"; echo "$tags") |
+    fzf --no-hscroll --ansi +m -d "\t" -n 2 --query="$2" \
+        --preview "$_fzf_git_log_preview {2} 2>/dev/null || $_fzf_git_log_preview origin/{2}") || return
+  git checkout "$(echo "$target" | awk '{print $2}')"
+}
+# fco  - checkout LOCAL git branch/tag (most recent first)
+fco()  { _fzf_checkout ""    "$1" }
+# fcoa - checkout any branch incl. remote
+fcoa() { _fzf_checkout --all "$1" }
+alias fbr=fcoa
+
+# fcoc - checkout git commit
+fcoc() {
+  local commit
+  _fzf_in_git || return
+  commit=$(git log --color=always --format="%C(auto)%h - %C(blue)%an, %ar%C(reset) : %s" |
+    fzf --ansi +s +m -e --preview 'git show --stat --color=always {1}') &&
+  [[ -n $commit ]] && git checkout "${commit%% *}"
+}
+
+# fshow [git log args] - commit browser. enter: full diff in less, ctrl-y: copy hash
+fshow() {
+  _fzf_in_git || return
+  local hash='echo {} | grep -o "[a-f0-9]\{7,\}" | head -1'
+  git log --graph --color=always \
+      --format="%C(auto)%h%d %s %C(black)%C(bold)%cr %C(blue)%an" "$@" |
+  fzf --ansi --no-sort --tiebreak=index --bind=ctrl-s:toggle-sort \
+      --header 'enter: show · ctrl-y: copy hash · ctrl-s: toggle sort' \
+      --preview "$hash | xargs git show --stat --color=always" \
+      --bind "enter:execute($hash | xargs -I % sh -c 'git show --color=always % | less -R')" \
+      --bind "ctrl-y:execute-silent($hash | tr -d '\n' | $_fzf_copy)+abort"
+}
+
+# changed files in `git status`, multi-select, diff preview
+_fzf_git_status_preview='f={-1}; if git ls-files --error-unmatch -- "$f" >/dev/null 2>&1; then git diff --color=always HEAD -- "$f"; else '"$_fzf_cat"' "$f"; fi'
+_fzf_git_status() {
+  git -c color.status=always status --short |
+    fzf --ansi -m --nth 2.. --query="$1" --preview "$_fzf_git_status_preview" "${@:2}" |
+    awk '{print $NF}'
+}
+
+# fga - pick files to `git add` (tab to multi-select)
+fga() {
+  _fzf_in_git || return
+  local -a files=("${(@f)$(_fzf_git_status "$1")}")
+  [[ -n $files ]] && git add -- "${files[@]}" && git status --short
+}
+# fgap - pick files, then `git add -p` just those
+fgap() {
+  _fzf_in_git || return
+  local -a files=("${(@f)$(_fzf_git_status "$1")}")
+  [[ -n $files ]] && git add -p -- "${files[@]}"
+}
+# fgd - browse changed files with diffs; enter opens selected in $EDITOR
+fgd() {
+  _fzf_in_git || return
+  local -a files=("${(@f)$(_fzf_git_status "$1" --preview-window 'right,70%')}")
+  [[ -n $files ]] && ${EDITOR:-vim} -- "${files[@]}"
+}
+
+# fstash - browse stashes. enter: apply · ctrl-x: drop · ctrl-p: pop
+fstash() {
+  _fzf_in_git || return
+  local out key ref
+  out=$(git stash list --color=always --format='%C(yellow)%gd%C(reset) %C(blue)%cr%C(reset) %s' |
+    fzf --ansi --no-sort --expect=ctrl-x,ctrl-p \
+        --header 'enter: apply · ctrl-p: pop · ctrl-x: drop' \
+        --preview 'git stash show -p --include-untracked --color=always {1}') || return
+  key=${out%%$'\n'*}; ref=${${out#*$'\n'}%% *}
+  [[ -z $ref ]] && return
+  case $key in
+    ctrl-x) git stash drop "$ref" ;;
+    ctrl-p) git stash pop "$ref" ;;
+    *)      git stash apply "$ref" ;;
+  esac
+}
+
+# fpr [gh pr list args] - checkout a PR, e.g. `fpr`, `fpr --author @me`
+fpr() {
+  (( $+commands[gh] )) || { echo "gh not installed" >&2; return 1 }
+  local pr
+  pr=$(gh pr list --limit 200 "$@" |
+    fzf --delimiter '\t' --with-nth 1,2,3 --preview 'GH_FORCE_TTY=100% gh pr view {1}' --preview-window 'right,60%') || return
+  gh pr checkout "${pr%%$'\t'*}"
+}
+
+# ctrl-g <key> widgets: insert git objects at the cursor, e.g.
+#   git rebase -i <ctrl-g ctrl-b>     git reset --soft <ctrl-g ctrl-h>
+_fzf_git_branches() {
+  git for-each-ref --sort=-committerdate refs/heads refs/remotes --format='%(refname:short)' |
+    grep -v '/HEAD$' | fzf -m --preview "$_fzf_git_log_preview {}"
+}
+_fzf_git_hashes() {
+  git log --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' -n 1000 |
+    fzf --ansi -m --no-sort --preview 'git show --stat --color=always {1}' | awk '{print $1}'
+}
+_fzf_git_files()   { _fzf_git_status "" }
+_fzf_git_stashes() {
+  git stash list | fzf --delimiter : --preview 'git stash show -p --color=always {1}' | cut -d: -f1
+}
+_fzf_git_tags() {
+  git tag --sort=-creatordate | fzf -m --preview "$_fzf_git_log_preview {}"
+}
+_fzf_git_widget() {
+  local fn=$1
+  if git rev-parse --git-dir >/dev/null 2>&1; then
+    local -a items=("${(@f)$($fn)}")
+    items=(${items:#})
+    (( $#items )) && LBUFFER+="${(j: :)${(q)items}} "
+  fi
+  zle reset-prompt
+}
+for _k in branches hashes files stashes tags; do
+  eval "fzf-git-$_k-widget() { _fzf_git_widget _fzf_git_$_k }"
+  zle -N fzf-git-$_k-widget
+done
+unset _k
+
+# --------------------------------------------------------------------------
+# Kubernetes / helm
+# --------------------------------------------------------------------------
+_fzf_k_header() {
+  local ns=$(kubectl config view --minify -o 'jsonpath={..namespace}' 2>/dev/null)
+  print -r -- "$(kubectl config current-context 2>/dev/null) / ${ns:-default}"
+}
+# _fzf_kpick <resource> [query] [fzf args...]
+_fzf_kpick() {
+  local res=$1 q=$2; shift 2
+  kubectl get "$res" --no-headers 2>/dev/null |
+    fzf --query="$q" --select-1 --exit-0 --header "$(_fzf_k_header)" \
+        --preview "kubectl describe $res {1} 2>/dev/null | tail -60" --preview-window 'down,50%' "$@" |
+    awk '{print $1}'
+}
+
+# fkx [query] - exec a shell in a pod (bash, falling back to sh)
+fkx() {
+  local pod=$(_fzf_kpick pods "$1")
+  [[ -n $pod ]] && kubectl exec -it "$pod" -- sh -c 'command -v bash >/dev/null && exec bash || exec sh'
+}
+# fkl [query] - follow logs of a pod
+fkl() {
+  local pod=$(_fzf_kpick pods "$1")
+  [[ -n $pod ]] && kubectl logs -f --tail=500 --all-containers --prefix "$pod"
+}
+# fkd [query] - delete pod(s); puts the command on the prompt so you can confirm
+fkd() {
+  local -a pods=(${(f)"$(_fzf_kpick pods "$1" -m)"})
+  (( $#pods )) && print -z "kubectl delete pod ${pods[*]}"
+}
+# fke [resource] [query] - kubectl edit, e.g. `fke configmap`, `fke deploy babka`
+fke() {
+  local res=${1:-deploy}
+  local name=$(_fzf_kpick "$res" "$2")
+  [[ -n $name ]] && kubectl edit "$res/$name"
+}
+# fkrr [query] - rollout restart a deployment (confirm on the prompt)
+fkrr() {
+  local name=$(_fzf_kpick deploy "$1")
+  [[ -n $name ]] && print -z "kubectl rollout restart deploy/$name"
+}
+# fhh [query] - helm history for a release
+fhh() {
+  local rel
+  rel=$(helm list --short 2>/dev/null |
+    fzf --query="$1" --select-1 --exit-0 --header "$(_fzf_k_header)" \
+        --preview 'helm history {} --max 15' --preview-window 'down,50%') || return
+  helm history "$rel"
+}
+
+# --------------------------------------------------------------------------
+# Docker
+# --------------------------------------------------------------------------
+_getDockerContainer() {
+  docker ps --format '{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}' |
+    fzf --delimiter '\t' --with-nth 2.. --query="$1" --select-1 --exit-0 \
+        --preview 'docker logs --tail 50 {1} 2>&1' --preview-window 'down,50%' |
+    cut -f1
+}
+# fdbash [query] - shell into a running container
+fdbash() {
+  local cid=$(_getDockerContainer "$1")
+  [[ -n $cid ]] && docker exec -it "$cid" sh -c 'command -v bash >/dev/null && exec bash || exec sh'
+}
+# fdlogs [query] - follow container logs
+fdlogs() {
+  local cid=$(_getDockerContainer "$1")
+  [[ -n $cid ]] && docker logs -f --tail 500 "$cid"
+}
+# fdstop [query] - stop a container
+fdstop() {
+  local cid=$(_getDockerContainer "$1")
+  [[ -n $cid ]] && docker stop "$cid"
+}
+# fdcl [query] - follow logs for docker compose service(s) in this project
+fdcl() {
+  local -a svcs=(${(f)"$(docker compose ps --services 2>/dev/null |
+    fzf -m --query="$1" --select-1 --exit-0 --preview 'docker compose logs --tail 50 {}')"})
+  (( $#svcs )) && docker compose logs -f --tail=200 "${svcs[@]}"
+}
+
+# --------------------------------------------------------------------------
+# Processes, ports, scripts, tmux
+# --------------------------------------------------------------------------
+
+# fkill [signal] - kill process(es), default -9
+fkill() {
+  local -a pids=(${(f)"$(ps -ef | fzf -m --header-lines=1 | awk '{print $2}')"})
+  (( $#pids )) && kill -${1:-9} "${pids[@]}"
+}
+
+# fport [query] - pick a listening TCP port; puts `kill <pid>` on the prompt
+fport() {
+  local -a pids=(${(f)"$(lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null |
+    fzf -m --header-lines=1 --query="$1" | awk '{print $2}' | sort -u)"})
+  (( $#pids )) && print -z "kill ${pids[*]}"
+}
+
+# fsc [query] - pick an executable under ./scripts (or ./*.sh) and put it on the prompt
+fsc() {
+  local -a cands=(./scripts/*(N*) ./scripts/*/*(N*) ./*.sh(N))
+  (( $#cands )) || { echo "no scripts here" >&2; return 1 }
+  local s
+  s=$(printf '%s\n' $cands | fzf --query="$1" --select-1 --preview "$_fzf_cat {}") && print -z "$s "
+}
+
+# fnr [query] - pick a package.json script; puts `<pm> run <script>` on the prompt
+fnr() {
+  [[ -f package.json ]] || { echo "no package.json" >&2; return 1 }
+  local pm=npm
+  [[ -f pnpm-lock.yaml ]] && pm=pnpm
+  [[ -f yarn.lock ]] && pm=yarn
+  local s
+  s=$(jq -r '.scripts // {} | to_entries[] | "\(.key)\t\(.value)"' package.json |
+    fzf --delimiter '\t' --with-nth 1 --query="$1" --preview 'echo {2}' --preview-window 'down,3,wrap') &&
+  print -z "$pm run ${s%%$'\t'*} "
+}
+
+# fs [query] - switch (or attach) to a tmux session
+fs() {
+  local session
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null |
+    fzf --query="$1" --select-1 --exit-0) || return
+  if [[ -n $TMUX ]]; then tmux switch-client -t "$session"; else tmux attach -t "$session"; fi
+}
+
+# --------------------------------------------------------------------------
+# Key bindings. Called from zshrc *after* `source ~/.fzf.zsh`, because
+# `fzf --zsh` installs its own bindings and would otherwise clobber these.
+# --------------------------------------------------------------------------
+fzf_post_init() {
+  local m
+  for m in viins vicmd; do
+    bindkey -M $m '\er'   fzf-history-widget
+    bindkey -M $m '\et'   fzf-file-widget
+    bindkey -M $m '\eu'   fzf-cd-up
+    bindkey -M $m '^G^B'  fzf-git-branches-widget
+    bindkey -M $m '^Gb'   fzf-git-branches-widget
+    bindkey -M $m '^G^H'  fzf-git-hashes-widget
+    bindkey -M $m '^Gh'   fzf-git-hashes-widget
+    bindkey -M $m '^G^F'  fzf-git-files-widget
+    bindkey -M $m '^Gf'   fzf-git-files-widget
+    bindkey -M $m '^G^S'  fzf-git-stashes-widget
+    bindkey -M $m '^Gs'   fzf-git-stashes-widget
+    bindkey -M $m '^G^T'  fzf-git-tags-widget
+    bindkey -M $m '^Gt'   fzf-git-tags-widget
+  done
+}
