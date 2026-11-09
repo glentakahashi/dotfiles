@@ -1,5 +1,4 @@
 #zmodload zsh/zprof   # uncomment (with `zprof` at the bottom) to profile startup
-source /etc/profile
 
 # real location of this repo (~/.zshrc is a symlink into it)
 DOTFILES=${${(%):-%x}:A:h}
@@ -22,15 +21,13 @@ cached_eval() {
   source $cache
 }
 
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
 export EDITOR="vim"
 export VISUAL="vim"
 export AWS_PAGER=""
 export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/config   # -> $DOTFILES/ripgreprc
 DISABLE_UNTRACKED_FILES_DIRTY=true   # prompt: untracked files don't mark the repo dirty
 
-# system specific PATH, colors, aliases (darwin/ or linux-gnu/)
+# system specific locale, PATH, colors, aliases (darwin/ or linux-gnu/)
 source ~/.zshrc.system
 
 source $DOTFILES/zsh/options.zsh
@@ -122,7 +119,7 @@ psg() { ps aux | grep -i -- "[${1[1]}]${1[2,-1]}" }
 port() { lsof -nP -iTCP${1:+:$1} -sTCP:LISTEN }
 mkcd() { mkdir -p -- "$1" && cd -- "$1" }
 
-export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
+[[ -d ~/.yarn/bin ]] && path=(~/.yarn/bin $path)
 
 # ---------------------------------------------------------------------------
 # Tools
@@ -133,6 +130,8 @@ source $DOTFILES/zsh/prompt.zsh
 (( $+commands[fzf] )) || { [[ -d ~/.fzf/bin ]] && path+=(~/.fzf/bin) }
 source ~/.zshrc.fzf
 cached_eval fzf fzf --zsh
+(( $+commands[fzf] && ! $+widgets[fzf-history-widget] )) &&
+  print -u2 "zshrc: fzf $(fzf --version 2>/dev/null | cut -d' ' -f1) is too old for its key bindings (needs 0.48+); run $DOTFILES/deploy.sh"
 fzf_post_init
 
 # zoxide (`z foo`, `zi` / `j` to pick); falls back to z.sh
@@ -148,8 +147,8 @@ source $DOTFILES/zsh/kubectl_aliases.zsh   # vendored ahmetb/kubectl-aliases
 # machine-local overrides (not in the repo)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
-export PATH="$HOME/projects/hex/bin:$PATH"
-export PATH="$PATH:$HOME/.local/bin"   # uv tools, claude
+[[ -d ~/projects/hex/bin ]] && path=(~/projects/hex/bin $path)
+path+=(~/.local/bin)                   # uv tools, claude, copy (Linux puts it first)
 [[ -d ${KREW_ROOT:-$HOME/.krew} ]] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 typeset -U path PATH                   # dedupe
 

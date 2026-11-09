@@ -30,7 +30,7 @@ if (( $+commands[bat] )); then
 else
   _fzf_preview_line='awk -v l={2} '\''{printf "%s%5d  %s\033[0m\n", (NR==l ? "\033[1;30;43m" : ""), NR, $0}'\'' {1}'
 fi
-_fzf_copy=${${commands[pbcopy]:+pbcopy}:-xclip -selection clipboard}
+_fzf_copy=copy   # $DOTFILES/bin/copy: pbcopy / wl-copy / xclip / clip.exe / OSC 52
 
 if (( $+commands[fd] )); then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'

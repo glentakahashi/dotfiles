@@ -1,0 +1,13 @@
+# Settings whose *values* older git rejects. An unknown key is ignored, but an
+# unknown value is fatal: on git < 2.35 (Ubuntu 22.04, Debian 11),
+# conflictStyle=zdiff3 makes every checkout/merge/rebase fail. deploy.sh
+# includes this file from ~/.gitconfig only when git is new enough.
+# requires: git 2.35
+
+[help]
+  # `git stauts` -> "Did you mean status? [y/N]" (you have ~30 such typos in history)
+  autocorrect = prompt
+
+[merge]
+  # like diff3, but common lines at the start/end of the conflict are moved out
+  conflictStyle = zdiff3

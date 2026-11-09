@@ -1,30 +1,32 @@
-#Linux specific overrides
+# Linux / WSL overrides (sourced early from zshrc). Works on a fresh
+# Debian/Ubuntu box once deploy.sh has run, and degrades if it hasn't.
 
-#dircolors
-test -e ~/.dircolors && eval `dircolors -b ~/.dircolors`
+# en_US.UTF-8 often isn't generated on a fresh Debian/Ubuntu; C.UTF-8 always
+# is. (A missing locale breaks the prompt's powerline glyphs.)
+if locale -a 2>/dev/null | grep -qiE '^en_US\.utf-?8$'; then
+  export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+else
+  export LANG=C.UTF-8 LC_ALL=C.UTF-8
+fi
 
-#del to move stuff to trash
-alias trash="gvfs-trash"
-alias del="trash"
+# first, so deploy.sh's pinned fzf/delta and the fd/bat names (Debian calls them
+# fdfind/batcat) win over older distro packages
+path=(~/.local/bin ~/bin(N/) $path)
 
-export PATH=/usr/local/bin/:/usr/bin/:~/bin/:/usr/local/lib64/:$PATH
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+[[ -e ~/.dircolors ]] && eval "$(dircolors -b ~/.dircolors)"
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias egrep='grep -E --color=auto'
 
-#simple proxy through ssh
-socks() {
-  if [[ -z $1 ]]; then
-    echo "Enter a place to proxy to."
-    return 1;
-  fi
-  #if a socks proxy already exists
-  if [[ -e "/tmp/socks.sock" ]]; then
-    unsocks
-  fi
-  ssh -4 -nNfM -S /tmp/socks.sock -D 1337 $1 2> /dev/null
-  gsettings set org.gnome.system.proxy mode "manual"
-}
-
-unsocks() {
-  gsettings set org.gnome.system.proxy mode "none"
-  ssh -S /tmp/socks.sock -O exit
-}
+if [[ -n $WSL_DISTRO_NAME ]]; then
+  # open files/dirs/URLs with the Windows default app
+  open() {
+    if (( $+commands[wslview] )); then wslview "$@"
+    elif [[ $1 == *://* ]]; then explorer.exe "$1"
+    else explorer.exe "$(wslpath -w "${1:-.}")"
+    fi
+  }
+elif (( $+commands[xdg-open] )); then
+  alias open='xdg-open'
+fi
+(( $+commands[gio] )) && alias trash='gio trash'

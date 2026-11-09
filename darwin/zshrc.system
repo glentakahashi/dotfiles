@@ -1,5 +1,11 @@
 #Mac specific overrides
 
+# path_helper (/etc/paths.d). It's POSIX sh, so source it in sh emulation.
+emulate sh -c '. /etc/profile'
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
 #java (skip if no JDK is installed; java_home prints an error otherwise)
 JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null) && export JAVA_HOME || unset JAVA_HOME
 
@@ -16,12 +22,7 @@ alias egrep="grep -E --color=auto"
 #fix for sed for mac
 #we cannot export those because it screws over terminal encoding
 alias sed="LC_ALL=C sed"
-function copy() {
-  cat "${@:--}" | pbcopy
-}
 
 function giffy() {
     ffmpeg -i $1 -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > $2
 }
-
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"

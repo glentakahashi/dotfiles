@@ -2,7 +2,10 @@
 # Install / update everything. Idempotent: safe to re-run any time.
 #
 #   ./deploy.sh              everything
-#   ./deploy.sh --no-brew    skip brew bundle (packages)
+#   ./deploy.sh --no-brew    skip packages (brew bundle / apt / pinned binaries)
+#
+# macOS, Linux (Debian/Ubuntu; other distros: install packages yourself) and
+# WSL get everything. Windows Git Bash gets the git, vim and ripgrep config.
 #   ./deploy.sh --update     also bump pinned third-party code (plugins.lock,
 #                            vendored files) to latest upstream; review with
 #                            `git diff` and commit
@@ -15,8 +18,9 @@ set -uo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 case "$OSTYPE" in
-  darwin*) SYSTEM=darwin ;;
-  *)       SYSTEM=linux-gnu ;;
+  darwin*)              SYSTEM=darwin ;;
+  msys*|cygwin*|win32*) SYSTEM=windows ;;   # Git Bash
+  *)                    SYSTEM=linux-gnu ;; # incl. WSL
 esac
 STAMP=$(date +%Y%m%d-%H%M%S)
 DO_BREW=1 DO_UPDATE=0
@@ -25,7 +29,7 @@ for arg in "$@"; do
     --no-brew) DO_BREW=0 ;;
     --no-vim)  ;;   # vim plugins are part of plugins.lock now; kept for old muscle memory
     --update)  DO_UPDATE=1 ;;
-    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,17p' "$0"; exit 0 ;;
     *) echo "unknown option: $arg" >&2; exit 1 ;;
   esac
 done
@@ -35,19 +39,57 @@ step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 ok()   { printf '  \033[32m✓\033[0m %s\n' "$*"; }
 warn() { printf '  \033[33m!\033[0m %s\n' "$*"; FAILED+=("$*"); }
 
+# Git Bash: real symlinks need Developer Mode; otherwise link() copies
+[[ $SYSTEM == windows ]] && export MSYS=winsymlinks:nativestrict
+
 # link <source in repo> <destination>
 link() {
   local src=$1 dst=$2
   if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
     return 0
   fi
+  # an up-to-date copy (Git Bash without symlink support)
+  [[ $SYSTEM == windows && -f $dst && ! -L $dst ]] && cmp -s "$src" "$dst" && return 0
   mkdir -p "$(dirname "$dst")"
   if [[ -L $dst ]]; then
     rm "$dst"
   elif [[ -e $dst ]]; then
     mv "$dst" "$dst.bak.$STAMP" && ok "backed up $dst -> $dst.bak.$STAMP"
   fi
-  ln -s "$src" "$dst" && ok "linked $dst"
+  if ln -s "$src" "$dst" 2>/dev/null; then
+    ok "linked $dst"
+  elif [[ $SYSTEM == windows ]]; then
+    cp "$src" "$dst" && ok "copied $dst (no symlink support; re-run deploy after pulling)"
+  else
+    warn "could not link $dst"
+  fi
+}
+
+# run as root directly, otherwise via sudo
+as_root() { if (( EUID == 0 )); then "$@"; else sudo "$@"; fi; }
+
+# install_binaries: pinned, sha256-checked release binaries from binaries.lock
+install_binaries() {
+  local platform name version plat sha url have tmp bin
+  platform="$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+  [[ $platform == linux-arm64 ]] && platform=linux-aarch64
+  mkdir -p ~/.local/bin
+  while read -r name version plat sha url; do
+    [[ -z $name || $name == \#* || $plat != "$platform" ]] && continue
+    have=$(~/.local/bin/"$name" --version 2>/dev/null | head -1)
+    [[ $have == *"$version"* ]] && { ok "$name $version"; continue; }
+    tmp=$(mktemp -d)
+    if ! curl -fsSL "$url" -o "$tmp/dl.tgz"; then
+      warn "could not download $url"
+    elif [[ "$(sha256sum "$tmp/dl.tgz" | cut -d' ' -f1)" != "$sha" ]]; then
+      warn "$name $version: sha256 mismatch for $url, not installing"
+    else
+      tar -xzf "$tmp/dl.tgz" -C "$tmp"
+      bin=$(find "$tmp" -type f -name "$name" | head -1)
+      install -m 755 "$bin" ~/.local/bin/"$name" && ok "installed $name $version (sha256 verified)"
+    fi
+    rm -rf "$tmp"
+  done < "$DOTFILES/binaries.lock"
 }
 
 # pin_repo <url> <dir> <commit>: make <dir> a checkout of exactly <commit>
@@ -105,12 +147,20 @@ if (( DO_BREW )); then
       eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     brew bundle --file="$DOTFILES/Brewfile" && ok "brew bundle" || warn "brew bundle had failures"
-  elif command -v apt-get >/dev/null; then
-    step "apt packages"
-    sudo apt-get install -y zsh git curl tmux vim fzf ripgrep fd-find bat zoxide jq \
-      && ok "apt" || warn "apt install had failures"
+  elif [[ $SYSTEM == linux-gnu ]]; then
+    if command -v apt-get >/dev/null; then
+      step "apt packages"
+      # fzf and delta come from binaries.lock (the packaged ones are too old / missing)
+      as_root apt-get update -qq &&
+      as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+        zsh git curl ca-certificates tmux vim ripgrep fd-find bat zoxide jq lsof direnv \
+        && ok "apt" || warn "apt install had failures"
+    else
+      warn "no apt: install zsh git curl tmux vim ripgrep fd bat zoxide jq yourself"
+    fi
+    step "Pinned binaries (binaries.lock)"
+    install_binaries
     # Debian names: fdfind / batcat
-    mkdir -p ~/.local/bin
     command -v fd  >/dev/null || { command -v fdfind >/dev/null && ln -sf "$(command -v fdfind)" ~/.local/bin/fd; }
     command -v bat >/dev/null || { command -v batcat >/dev/null && ln -sf "$(command -v batcat)" ~/.local/bin/bat; }
   fi
@@ -118,11 +168,14 @@ fi
 
 # ---------------------------------------------------------------------------
 step "Symlinks"
-link "$DOTFILES/zshrc"                      ~/.zshrc
-link "$DOTFILES/zshrc.fzf"                  ~/.zshrc.fzf
-link "$DOTFILES/$SYSTEM/zshrc.system"       ~/.zshrc.system
-link "$DOTFILES/tmux.conf"                  ~/.tmux.conf
-link "$DOTFILES/$SYSTEM/tmux.system.conf"   ~/.tmux.system.conf
+if [[ $SYSTEM != windows ]]; then
+  link "$DOTFILES/zshrc"                    ~/.zshrc
+  link "$DOTFILES/zshrc.fzf"                ~/.zshrc.fzf
+  link "$DOTFILES/$SYSTEM/zshrc.system"     ~/.zshrc.system
+  link "$DOTFILES/tmux.conf"                ~/.tmux.conf
+  link "$DOTFILES/$SYSTEM/tmux.system.conf" ~/.tmux.system.conf
+fi
+link "$DOTFILES/bin/copy"                   ~/.local/bin/copy
 link "$DOTFILES/vimrc"                      ~/.vimrc
 link "$DOTFILES/vim/colors/solarized8.vim" ~/.vim/colors/solarized8.vim
 link "$DOTFILES/ripgreprc"                  ~/.config/ripgrep/config
@@ -142,6 +195,7 @@ done
 
 step "Local override files"
 for f in ~/.zshrc.local ~/.tmux.local.conf ~/.vimrc.local; do
+  [[ $SYSTEM == windows && $f != *vimrc* ]] && continue
   [[ -e $f ]] || { touch "$f" && ok "created $f"; }
 done
 
@@ -150,11 +204,31 @@ step "Git config"
 # ~/.gitconfig stays machine-specific (credential helpers etc.) and includes
 # the shared repo config, so edits to $DOTFILES/gitconfig apply immediately.
 touch ~/.gitconfig
+inc=$DOTFILES/gitconfig
+# Git for Windows can't read /c/... paths in config; give it C:/...
+[[ $SYSTEM == windows ]] && command -v cygpath >/dev/null && inc=$(cygpath -m "$inc")
 if git config --global --get-all include.path 2>/dev/null |
-     sed "s|^~|$HOME|" | grep -qx "$DOTFILES/gitconfig"; then
-  ok "~/.gitconfig already includes $DOTFILES/gitconfig"
+     sed "s|^~|$HOME|" | grep -qxF "$inc"; then
+  ok "~/.gitconfig already includes $inc"
 else
-  git config --global --add include.path "$DOTFILES/gitconfig" && ok "added include to ~/.gitconfig"
+  git config --global --add include.path "$inc" && ok "added include to ~/.gitconfig"
+fi
+# gitconfig.modern: only where git understands its values (see the file)
+modern=${inc%gitconfig}gitconfig.modern
+git_v=$(git --version | awk '{print $3}')
+need=$(sed -n 's/^# requires: git //p' "$DOTFILES/gitconfig.modern")
+has_modern=$(git config --global --get-all include.path 2>/dev/null | sed "s|^~|$HOME|" | grep -cxF "$modern")
+if [[ "$(printf '%s\n' "$need" "$git_v" | sort -V | head -1)" == "$need" ]]; then
+  (( has_modern )) || { git config --global --add include.path "$modern" && ok "added include of gitconfig.modern"; }
+else
+  (( has_modern )) && git config --global --fixed-value --unset-all include.path "$modern" 2>/dev/null
+  ok "git $git_v < $need: skipping gitconfig.modern (zdiff3, autocorrect=prompt)"
+fi
+
+if [[ $SYSTEM == linux-gnu ]] && command -v zsh >/dev/null &&
+   [[ "$(getent passwd "$USER" | cut -d: -f7)" != */zsh ]]; then
+  step "Login shell"
+  as_root chsh -s "$(command -v zsh)" "$USER" && ok "login shell is now zsh (log in again)" || warn "chsh to zsh failed"
 fi
 
 # ---------------------------------------------------------------------------
@@ -181,8 +255,8 @@ vim_wanted=()
 while read -r kind name url sha; do
   [[ -z $kind || $kind == \#* ]] && continue
   case $kind in
-    zsh)  pin_repo "$url" "$ZSH_PLUGIN_DIR/$name" "$sha" ;;
-    tmux) pin_repo "$url" "$HOME/.tmux/plugins/$name" "$sha" ;;
+    zsh)  command -v zsh  >/dev/null && pin_repo "$url" "$ZSH_PLUGIN_DIR/$name" "$sha" ;;
+    tmux) command -v tmux >/dev/null && pin_repo "$url" "$HOME/.tmux/plugins/$name" "$sha" ;;
     vim)  pin_repo "$url" "$VIM_PACK_DIR/$name" "$sha"; vim_wanted+=("$name") ;;
     *)    warn "unknown kind '$kind' in plugins.lock" ;;
   esac

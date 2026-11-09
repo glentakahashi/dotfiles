@@ -1,0 +1,13 @@
+# Prebuilt binaries deploy.sh installs into ~/.local/bin on Linux, where the
+# distro's package is too old (Debian 12 ships fzf 0.38; `fzf --zsh` needs
+# 0.48) or missing (delta isn't packaged before Debian 13). macOS gets these
+# from Homebrew. Each download is checked against the sha256 here before use.
+#
+# To bump: change the version, download the new assets, put
+# `shasum -a 256 <file>` here, and run deploy.sh.
+#
+# name  version  platform       sha256                                                            url
+fzf     0.72.0   linux-x86_64   0e58e4bd0b3c5d68c56b54c460a6863d0de79633ed18d388575a960ab447b006  https://github.com/junegunn/fzf/releases/download/v0.72.0/fzf-0.72.0-linux_amd64.tar.gz
+fzf     0.72.0   linux-aarch64  a0a5b50730f568c5f08b8dbba1e6e598db253e1856d371290086786b889b996b  https://github.com/junegunn/fzf/releases/download/v0.72.0/fzf-0.72.0-linux_arm64.tar.gz
+delta   0.19.2   linux-x86_64   f1ea01ca7728ce3462debc359f39dfc7cbbc1a63224b71fefabf92042864aa1b  https://github.com/dandavison/delta/releases/download/0.19.2/delta-0.19.2-x86_64-unknown-linux-musl.tar.gz
+delta   0.19.2   linux-aarch64  0bfce159a5cddd5feb3d6db4a616d883ff51253ce08ac7ec11cb1d208cfaab9e  https://github.com/dandavison/delta/releases/download/0.19.2/delta-0.19.2-aarch64-unknown-linux-gnu.tar.gz

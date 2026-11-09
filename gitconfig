@@ -88,10 +88,6 @@
 [fetch]
   prune = true
 
-[help]
-  # `git stauts` -> "Did you mean status? [y/N]" (you have ~30 such typos in history)
-  autocorrect = prompt
-
 [rerere]
   # remember conflict resolutions; helps with repeated rebases onto master
   enabled = true
@@ -102,7 +98,8 @@
   colorMoved = default
 
 [merge]
-  conflictStyle = zdiff3
+  # zdiff3 (git >= 2.35) is set in gitconfig.modern
+  conflictStyle = diff3
 
 [branch]
   sort = -committerdate

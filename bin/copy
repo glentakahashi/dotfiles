@@ -1,0 +1,19 @@
+#!/bin/sh
+# copy [file...] - put stdin (or files) on the clipboard, wherever this runs:
+# macOS, Wayland, X11, WSL, Git Bash, or a headless/ssh box via OSC 52 (the
+# terminal sets the clipboard; works through tmux with set-clipboard on).
+if command -v pbcopy >/dev/null 2>&1; then
+  cat "$@" | pbcopy
+elif [ -n "$WAYLAND_DISPLAY" ] && command -v wl-copy >/dev/null 2>&1; then
+  cat "$@" | wl-copy
+elif [ -n "$DISPLAY" ] && command -v xclip >/dev/null 2>&1; then
+  cat "$@" | xclip -selection clipboard
+elif [ -n "$DISPLAY" ] && command -v xsel >/dev/null 2>&1; then
+  cat "$@" | xsel --clipboard --input
+elif command -v clip.exe >/dev/null 2>&1; then   # WSL, Git Bash
+  cat "$@" | clip.exe
+elif { : > /dev/tty; } 2>/dev/null; then
+  printf '\033]52;c;%s\a' "$(cat "$@" | base64 | tr -d '\n')" > /dev/tty
+else
+  echo "copy: no clipboard tool and no terminal for OSC 52" >&2; exit 1
+fi
