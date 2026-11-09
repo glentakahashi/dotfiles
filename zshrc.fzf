@@ -148,7 +148,7 @@ j() {
 # --------------------------------------------------------------------------
 _fzf_in_git() { git rev-parse --git-dir >/dev/null 2>&1 || { echo "not a git repo" >&2; return 1 } }
 
-_fzf_git_log_preview='git log --oneline --graph --color=always --date=short --format="%C(auto)%h %C(blue)%ad%C(auto)%d %s %C(black)%C(bold)%an" -40'
+_fzf_git_log_preview='git log --oneline --graph --color=always --date=short --format="%C(auto)%h %C(blue)%ad%C(auto)%d %s %C(black)%C(bold)%an" -40 --end-of-options'
 
 # shared picker for fco / fcoa
 _fzf_checkout() {

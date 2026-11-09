@@ -40,6 +40,6 @@ if [[ -f $ZSH_PLUGINS/fzf-tab/fzf-tab.plugin.zsh ]]; then
   zstyle ':fzf-tab:complete:(cd|z|ls|vim|cat|bat):*' fzf-preview \
     '[[ -d $realpath ]] && ls -1 --color=always $realpath || head -100 $realpath'
   zstyle ':fzf-tab:complete:git-(checkout|switch|rebase|merge|log|diff):*' fzf-preview \
-    'git log --oneline --graph --color=always -20 $word 2>/dev/null'
+    'git log --oneline --graph --color=always -20 --end-of-options "$word" -- 2>/dev/null'
   zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps -p $word -o pid,user,%cpu,%mem,command'
 fi
