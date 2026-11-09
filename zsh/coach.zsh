@@ -2,7 +2,9 @@
 #
 #   coach              full report for the last 30 days
 #   coach -d 90        look further back
-#   coach --claude     also ask `claude -p` for ideas (sends only the counts below)
+#   coach --claude     also ask `claude -p` for ideas. Sends only counts of command
+#                      names + plain subcommand words (`git status`, `hdev watch`)
+#                      and your alias names; never arguments, paths, URLs or values
 #
 # Shown automatically: a 3-4 line digest above the prompt, at most once every
 # $COACH_INTERVAL_DAYS days (default 7), in the first interactive shell after
@@ -138,7 +140,12 @@ coach() {
     { print "Top commands from my zsh history (last $days days) with counts, and aliases I have but don't use."
       print "Suggest up to 5 concrete zsh aliases/functions or tools that would save me the most typing. Be brief; one line each."
       print
-      awk '{print $1, $2}' <(LC_ALL=C sed -E -n 's/^: [0-9]+:[0-9]+;//p' $hist | tail -3000) | sort | uniq -c | sort -rn | head -40
+      # command name, plus the 2nd word only if it looks like a subcommand
+      # (lowercase letters/digits/-/:), so arguments and secrets never leave
+      LC_ALL=C sed -E -n 's/^: [0-9]+:[0-9]+;//p' $hist | tail -3000 |
+        awk '$1 ~ /^[A-Za-z0-9_.\/-]+$/ { c = $1; sub(/.*\//, "", c)
+               if ($2 ~ /^[a-z][a-z0-9:-]*$/) c = c " " $2; print c }' |
+        sort | uniq -c | sort -rn | head -40
       print; print "Aliases I have but typed the long way (count, alias, expansion):"
       for f in $A; do print -r -- "${${(@ps:\t:)f}[2,4]}"; done
     } | claude -p 2>/dev/null
