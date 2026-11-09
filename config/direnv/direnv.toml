@@ -1,0 +1,5 @@
+# direnv settings. Keep "loading .envrc" / "using devbox" visible (so a slow
+# devbox load is obviously working, not hung), but drop the long
+# "export +VAR +VAR ..." line.
+[global]
+hide_env_diff = true

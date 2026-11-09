@@ -189,6 +189,7 @@ link "$DOTFILES/vimrc"                      ~/.vimrc
 link "$DOTFILES/vim/colors/solarized8.vim" ~/.vim/colors/solarized8.vim
 link "$DOTFILES/ripgreprc"                  ~/.config/ripgrep/config
 link "$DOTFILES/git/ignore"                 ~/.config/git/ignore
+link "$DOTFILES/config/direnv/direnv.toml"  ~/.config/direnv/direnv.toml
 if [[ $SYSTEM == darwin ]]; then
   cursor_dir=~/Library/Application\ Support/Cursor/User
   link "$DOTFILES/cursor/settings.json"    "$cursor_dir/settings.json"
