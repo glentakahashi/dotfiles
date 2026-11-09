@@ -31,26 +31,6 @@ map <leader>d :Bclose<CR>
 map <leader>D :Bclose!<CR>
 
 syntax on
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_java_checkers=['javac']
-let g:syntastic_java_javac_config_file_enabled = 1
-let g:syntastic_typescript_checkers = ['tslint', 'tsc']
-let g:syntastic_aggregate_errors = 1
-
-" Enable jsx for tsx files
-autocmd BufNewFile,BufReadPre *.tsx let g:syntastic_typescript_tsc_args = '--jsx react'
-
-" Search upwards for .syntastic_javac_config
-autocmd BufNewFile,BufReadPre *.java let g:syntastic_java_javac_config_file = findfile('.syntastic_javac_config', '.;')
-
-let g:syntastic_typescript_tsc_fname = ''
 
 augroup qf
     autocmd!
@@ -109,7 +89,8 @@ noremap <silent> <Leader>u :UndotreeToggle<CR>
 if &term == 'xterm' || &term == 'screen'
   set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
 endif
-color solarized                 " Load a colorscheme
+let g:solarized_use16 = 1        " use the terminal's solarized palette, like the old plugin
+silent! colorscheme solarized8
 set background=dark
 
 hi Normal ctermbg=none          " Use background from terminal
@@ -220,22 +201,6 @@ map <leader>c :call StripTrailingWhitespace()<CR>
 "new tab
 "map <silent> <C-t>n :tabe<CR>
 
-let g:multi_cursor_exit_from_visual_mode = 0
-"let g:multi_cursor_exit_from_insert_mode = 0
-
-" Called once right before you start selecting multiple cursors
-function! Multiple_cursors_before()
-  if exists(':NeoCompleteLock')==2
-    exe 'NeoCompleteLock'
-  endif
-endfunction
-
-" Called once only when the multiple selection is canceled (default <Esc>)
-function! Multiple_cursors_after()
-  if exists(':NeoCompleteUnlock')==2
-    exe 'NeoCompleteUnlock'
-  endif
-endfunction
 
 " open window in a new tab instead
 "map <silent> <C-w>t :tabedit %<CR> TODO:

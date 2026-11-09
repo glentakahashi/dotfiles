@@ -199,8 +199,20 @@ if (( DO_VIM )); then
   [[ -f ~/.vim/autoload/plug.vim ]] ||
     fetch https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ~/.vim/autoload/plug.vim
   # not -Es: vim-plug's UI raises harmless E31 errors in Ex mode
-  vim -N -u ~/.vimrc +'PlugClean!' +'PlugUpdate --sync' +'qa!' </dev/null >/dev/null 2>&1
-  ok "PlugUpdate"
+  if (( DO_UPDATE )); then
+    vim -N -u ~/.vimrc +'PlugClean!' +'PlugUpdate --sync' +"PlugSnapshot! $DOTFILES/vimplug.lock" +'qa!' </dev/null >/dev/null 2>&1
+    ok "PlugUpdate; new commits written to vimplug.lock"
+  else
+    vim -N -u ~/.vimrc +'PlugClean!' +'PlugInstall --sync' +'qa!' </dev/null >/dev/null 2>&1
+    # check out the commits recorded in vimplug.lock (vim-plug's own restore is async)
+    sed -nE "s/.*g:plugs\['([^']+)'\]\.commit = '([0-9a-f]+)'.*/\1 \2/p" "$DOTFILES/vimplug.lock" |
+    while read -r name sha; do
+      dir=~/.vim/plugged/$name
+      [[ -d $dir/.git ]] || { warn "vim plugin $name missing"; continue; }
+      pin_repo "$(git -C "$dir" remote get-url origin)" "$dir" "$sha"
+    done
+    ok "vim plugins match vimplug.lock"
+  fi
 fi
 
 # ---------------------------------------------------------------------------
