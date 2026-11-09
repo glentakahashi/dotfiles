@@ -1,105 +1,185 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Install / update everything. Idempotent: safe to re-run any time.
+#
+#   ./deploy.sh              everything
+#   ./deploy.sh --no-brew    skip brew bundle (packages)
+#   ./deploy.sh --no-vim     skip vim-plug install/update
+#
+# - Existing real files are moved to <file>.bak.<timestamp> before linking;
+#   correct symlinks are left alone.
+# - Git repos (plugins etc.) are cloned if missing, fast-forwarded otherwise.
+set -uo pipefail
 
-#get the directly of where this script is run, and consequently where the files are located
-SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+case "$OSTYPE" in
+  darwin*) SYSTEM=darwin ;;
+  *)       SYSTEM=linux-gnu ;;
+esac
+STAMP=$(date +%Y%m%d-%H%M%S)
+DO_BREW=1 DO_VIM=1
+for arg in "$@"; do
+  case $arg in
+    --no-brew) DO_BREW=0 ;;
+    --no-vim)  DO_VIM=0 ;;
+    -h|--help) sed -n '2,10p' "$0"; exit 0 ;;
+    *) echo "unknown option: $arg" >&2; exit 1 ;;
+  esac
+done
 
-SYSTEM=${OSTYPE//[0-9.]/}
+FAILED=()
+step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
+ok()   { printf '  \033[32m✓\033[0m %s\n' "$*"; }
+warn() { printf '  \033[33m!\033[0m %s\n' "$*"; FAILED+=("$*"); }
 
-# Install dependencies
-if [[ $SYSTEM == "darwin" ]]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep reattach-to-user-namespace vim tmux node ag neovim
-fi
-
-# TODO: install tmux from source
-
-#warn if they already have one of the .bak files that exists
-if [[  -e ~/.tmux.conf.bak || -e ~/.tmux.reset.conf.bak \
-    || -e ~/.tmux.system.conf.bak \
-    || -e ~/.zshrc.bak || -e ~/.vimrc.bak \
-    || -e ~/.dircolors.bak || -e ~/.vim.bak
-    || -e ~/.zsh.bak || -e ~/.gitconfig.bak ]]; then
-    echo "Warning! one or more *.bak files exist in your home directory that may get overwritten!"
-    read -p "Continue? [y/n]" yn
-    while true; do
-        case $yn in
-            [Yy]* )
-                break
-                ;;
-            [Nn]* )
-                exit
-                ;;
-            * )
-                read -p "Please answer yes or no. [y/n]" yn
-                ;;
-        esac
-    done
-fi
-
-#git depends on being in directory, so cd to directory first
-cd $SCRIPTPATH
-
-function backupIfNotSymlink() {
-    if [[ -L $1 ]]; then
-        rm -v "$1"
-    elif [[ -e $1 ]]; then
-        mv -v -f "$1" "$1.bak"
-    fi
+# link <source in repo> <destination>
+link() {
+  local src=$1 dst=$2
+  if [[ -L $dst && "$(readlink "$dst")" == "$src" ]]; then
+    return 0
+  fi
+  mkdir -p "$(dirname "$dst")"
+  if [[ -L $dst ]]; then
+    rm "$dst"
+  elif [[ -e $dst ]]; then
+    mv "$dst" "$dst.bak.$STAMP" && ok "backed up $dst -> $dst.bak.$STAMP"
+  fi
+  ln -s "$src" "$dst" && ok "linked $dst"
 }
 
-#remove symlinks if they exist or backup file
-backupIfNotSymlink ~/.tmux.conf
-backupIfNotSymlink ~/.tmux.reset.conf
-backupIfNotSymlink ~/.tmux.system.conf
-backupIfNotSymlink ~/.zshrc
-backupIfNotSymlink ~/.zshrc.system
-backupIfNotSymlink ~/.zshrc.fzf
-backupIfNotSymlink ~/.vimrc
-backupIfNotSymlink ~/.vimplug
-backupIfNotSymlink ~/.dircolors
-backupIfNotSymlink ~/.gitconfig
-rm -rf ~/.vim.bak
-backupIfNotSymlink ~/.vim
-backupIfNotSymlink ~/.zsh
-backupIfNotSymlink ~/Library/Application\ Support/Code/User/settings.json
-backupIfNotSymlink ~/.template.html
-backupIfNotSymlink ~/.agignore
+# sync_repo <url> <dir>
+sync_repo() {
+  local url=$1 dir=$2
+  if [[ -d $dir/.git ]]; then
+    git -C "$dir" pull --ff-only -q 2>/dev/null && ok "updated ${dir/#$HOME/~}" || warn "could not update $dir"
+  else
+    mkdir -p "$(dirname "$dir")"
+    git clone -q --depth 1 "$url" "$dir" && ok "cloned ${dir/#$HOME/~}" || warn "could not clone $url"
+  fi
+}
 
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
-git clone https://github.com/glentakahashi/oh-my-zsh.git ~/.oh-my-zsh
-git clone https://github.com/jonmosco/kube-ps1.git ~/.kube-ps1
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-curl -fLo ~/.z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
-curl -fLo ~/.kubectl_aliases https://raw.githubusercontent.com/ahmetb/kubectl-alias/master/.kubectl_aliases
+# fetch <url> <file>: download, only replacing the file on success
+fetch() {
+  local url=$1 dst=$2 tmp
+  tmp=$(mktemp)
+  if curl -fsSL "$url" -o "$tmp"; then
+    mkdir -p "$(dirname "$dst")"; mv "$tmp" "$dst" && ok "fetched ${dst/#$HOME/~}"
+  else
+    rm -f "$tmp"; warn "could not download $url"
+  fi
+}
 
-#make the new symlinks
-ln -v -s $SCRIPTPATH/tmux.conf ~/.tmux.conf
-ln -v -s $SCRIPTPATH/tmux.reset.conf ~/.tmux.reset.conf
-ln -v -s $SCRIPTPATH/vimrc ~/.vimrc
-ln -v -s $SCRIPTPATH/vimplug ~/.vimplug
-ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
-ln -v -s $SCRIPTPATH/zshrc.fzf ~/.zshrc.fzf
-ln -v -s ~/.dircolors-solarized/dircolors.ansi-dark ~/.dircolors
-ln -v -s $SCRIPTPATH/template.html ~/.template.html
-ln -v -s $SCRIPTPATH/agignore ~/.agignore
-#ln -v -s $SCRIPTPATH/gitconfig ~/.gitconfig
-#COPY GITCONFIG BECAUSE IF ITS BROKEN ITS ANNOYING TO MERGE
-cp -v $SCRIPTPATH/gitconfig ~/.gitconfig
-
-if [[ $SYSTEM == "darwin" ]]; then
-    ln -v -s $SCRIPTPATH/vscode.json ~/Library/Application\ Support/Code/User/settings.json
+# ---------------------------------------------------------------------------
+if (( DO_BREW )); then
+  if [[ $SYSTEM == darwin ]]; then
+    step "Homebrew packages (Brewfile)"
+    if ! command -v brew >/dev/null; then
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+    brew bundle --file="$DOTFILES/Brewfile" && ok "brew bundle" || warn "brew bundle had failures"
+  elif command -v apt-get >/dev/null; then
+    step "apt packages"
+    sudo apt-get install -y zsh git curl tmux vim fzf ripgrep fd-find bat zoxide jq \
+      && ok "apt" || warn "apt install had failures"
+    # Debian names: fdfind / batcat
+    mkdir -p ~/.local/bin
+    command -v fd  >/dev/null || { command -v fdfind >/dev/null && ln -sf "$(command -v fdfind)" ~/.local/bin/fd; }
+    command -v bat >/dev/null || { command -v batcat >/dev/null && ln -sf "$(command -v batcat)" ~/.local/bin/bat; }
+  fi
 fi
 
-#these two files depend upon system type
-ln -s $SCRIPTPATH/$SYSTEM/tmux.system.conf ~/.tmux.system.conf
-ln -s $SCRIPTPATH/$SYSTEM/zshrc.system ~/.zshrc.system
+# ---------------------------------------------------------------------------
+step "Symlinks"
+link "$DOTFILES/zshrc"                      ~/.zshrc
+link "$DOTFILES/zshrc.fzf"                  ~/.zshrc.fzf
+link "$DOTFILES/$SYSTEM/zshrc.system"       ~/.zshrc.system
+link "$DOTFILES/tmux.conf"                  ~/.tmux.conf
+link "$DOTFILES/tmux.reset.conf"            ~/.tmux.reset.conf
+link "$DOTFILES/$SYSTEM/tmux.system.conf"   ~/.tmux.system.conf
+link "$DOTFILES/vimrc"                      ~/.vimrc
+link "$DOTFILES/vimplug"                    ~/.vimplug
+link "$DOTFILES/template.html"              ~/.template.html
+link "$DOTFILES/agignore"                   ~/.agignore
+if [[ $SYSTEM == darwin ]]; then
+  cursor_dir=~/Library/Application\ Support/Cursor/User
+  link "$DOTFILES/cursor/settings.json"    "$cursor_dir/settings.json"
+  link "$DOTFILES/cursor/keybindings.json" "$cursor_dir/keybindings.json"
+  # old VS Code setup pointed at a now-deleted repo file
+  code_settings=~/Library/Application\ Support/Code/User/settings.json
+  [[ -L $code_settings && "$(readlink "$code_settings")" == "$DOTFILES/"* ]] && rm "$code_settings" && ok "removed stale VS Code settings link"
+fi
 
-#create the local changes files if they don't exist
-touch ~/.tmux.local.conf
-touch ~/.zshrc.local
-touch ~/.vimrc.local
+step "Local override files"
+for f in ~/.zshrc.local ~/.tmux.local.conf ~/.vimrc.local; do
+  [[ -e $f ]] || { touch "$f" && ok "created $f"; }
+done
 
-vim +PlugClean +PlugUpdate +qall
+# ---------------------------------------------------------------------------
+step "Git config"
+# ~/.gitconfig stays machine-specific (credential helpers etc.) and includes
+# the shared repo config, so edits to $DOTFILES/gitconfig apply immediately.
+touch ~/.gitconfig
+if git config --global --get-all include.path 2>/dev/null |
+     sed "s|^~|$HOME|" | grep -qx "$DOTFILES/gitconfig"; then
+  ok "~/.gitconfig already includes $DOTFILES/gitconfig"
+else
+  git config --global --add include.path "$DOTFILES/gitconfig" && ok "added include to ~/.gitconfig"
+fi
 
-#python3 ~/.vim/plugged/YouCompleteMe/install.py
+# ---------------------------------------------------------------------------
+step "Shell plugins and helpers"
+PLUGINS=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins
+sync_repo https://github.com/Aloxaf/fzf-tab                      "$PLUGINS/fzf-tab"
+sync_repo https://github.com/zsh-users/zsh-autosuggestions       "$PLUGINS/zsh-autosuggestions"
+sync_repo https://github.com/zsh-users/zsh-syntax-highlighting   "$PLUGINS/zsh-syntax-highlighting"
+sync_repo https://github.com/MichaelAquilina/zsh-you-should-use  "$PLUGINS/zsh-you-should-use"
+sync_repo https://github.com/jonmosco/kube-ps1                   ~/.kube-ps1
+sync_repo https://github.com/seebi/dircolors-solarized           ~/.dircolors-solarized
+link ~/.dircolors-solarized/dircolors.ansi-dark ~/.dircolors
+fetch https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases ~/.kubectl_aliases
+
+# one-time: carry z.sh history over to zoxide
+if command -v zoxide >/dev/null && [[ -s ~/.z ]] && [[ -z "$(zoxide query -l 2>/dev/null | head -1)" ]]; then
+  zoxide import --from=z ~/.z && ok "imported ~/.z into zoxide"
+fi
+
+# init scripts are cached by zshrc's cached_eval; clear so they regenerate
+rm -f "${XDG_CACHE_HOME:-$HOME/.cache}"/zsh/eval-*.zsh
+
+# ---------------------------------------------------------------------------
+step "tmux plugins"
+sync_repo https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+~/.tmux/plugins/tpm/bin/install_plugins >/dev/null && ok "tpm install" || warn "tpm install"
+~/.tmux/plugins/tpm/bin/update_plugins all >/dev/null && ok "tpm update" || warn "tpm update"
+
+# ---------------------------------------------------------------------------
+if (( DO_VIM )); then
+  step "vim plugins"
+  [[ -f ~/.vim/autoload/plug.vim ]] ||
+    fetch https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ~/.vim/autoload/plug.vim
+  # not -Es: vim-plug's UI raises harmless E31 errors in Ex mode
+  vim -N -u ~/.vimrc +'PlugClean!' +'PlugUpdate --sync' +'qa!' </dev/null >/dev/null 2>&1
+  ok "PlugUpdate"
+fi
+
+# ---------------------------------------------------------------------------
+if [[ $SYSTEM == darwin ]]; then
+  step "iTerm2"
+  "$DOTFILES/darwin/iterm/install.sh" && ok "iTerm profile" || warn "iTerm profile"
+
+  if command -v cursor >/dev/null; then
+    step "Cursor extensions"
+    "$DOTFILES/cursor/extensions.sh" install && ok "extensions in sync" || warn "cursor extensions"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+step "Done"
+[[ -d ~/.oh-my-zsh ]] && echo "  note: ~/.oh-my-zsh is no longer used; delete it when happy: rm -rf ~/.oh-my-zsh"
+[[ -d ~/.fzf ]] && command -v brew >/dev/null && brew list fzf >/dev/null 2>&1 &&
+  echo "  note: ~/.fzf (git install) is superseded by brew's fzf; remove with: rm -rf ~/.fzf ~/.fzf.zsh ~/.fzf.bash"
+if (( ${#FAILED[@]} )); then
+  printf '\n\033[33m%d step(s) had problems:\033[0m\n' "${#FAILED[@]}"; printf '  - %s\n' "${FAILED[@]}"
+  exit 1
+fi
+echo "  open a new shell (or: exec zsh)"
