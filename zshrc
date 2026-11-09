@@ -1,186 +1,10 @@
 #zmodload zsh/zprof   # uncomment (with `zprof` at the bottom) to profile startup
 source /etc/profile
 
-# kube-ps1
-[[ -f ~/.kube-ps1/kube-ps1.sh ]] && source ~/.kube-ps1/kube-ps1.sh
-export KUBE_PS1_NS_ENABLE=false
-export KUBE_PS1_SYMBOL_ENABLE=false
-
-# oh-my-zsh options
-ZSH=~/.oh-my-zsh
-ZSH_THEME="agnoster"
-DISABLE_AUTO_UPDATE="true"
-DISABLE_CORRECTION="true"
-DISABLE_UNTRACKED_FILES_DIRTY="true"
-ZSH_DISABLE_COMPFIX="true"          # skip the slow insecure-dir check on every start
-plugins=(git)
-source ~/.oh-my-zsh/oh-my-zsh.sh
-
-# ---------------------------------------------------------------------------
-# History
-# ---------------------------------------------------------------------------
-# omz defaults SAVEHIST to 10000, which silently truncates the file.
-HISTSIZE=500000
-SAVEHIST=500000
-setopt hist_reduce_blanks
-setopt hist_find_no_dups
-
-# Keep secrets and editor noise out of ~/.zsh_history.
-# Returning 1 still lets the command run, it just isn't saved.
-zshaddhistory() {
-  local line=${1%%$'\n'}
-  [[ $line =~ '(_KEY|_TOKEN|_SECRET|PASSWORD|PASSWD)=[^ ]' ]] && return 1
-  [[ $line == *printEnvVariablesToFile.py* ]] && return 1   # cursor/vscode python ext
-  return 0
-}
-
-# ---------------------------------------------------------------------------
-# Vi mode / keys
-# ---------------------------------------------------------------------------
-# Updates editor information when the keymap changes.
-function zle-keymap-select() {
-  zle reset-prompt
-  zle -R
-}
-
-# Ensure that the prompt is redrawn when the terminal size changes.
-TRAPWINCH() {
-  zle && { zle reset-prompt; zle -R }
-}
-
-zle -N zle-keymap-select
-autoload -Uz edit-command-line
-zle -N edit-command-line
-
-bindkey -v
-
-# allow v to edit the command line (standard behaviour)
-bindkey -M vicmd 'v' edit-command-line
-
-# allow ctrl-p, ctrl-n for navigate history (standard behaviour)
-bindkey '^P' up-history
-bindkey '^N' down-history
-
-# allow ctrl-h, ctrl-w, ctrl-? for char and word deletion (standard behaviour)
-bindkey '^?' backward-delete-char
-bindkey '^h' backward-delete-char
-bindkey '^w' backward-kill-word
-
-# type a prefix then up/down to search history for it
-autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
-bindkey '^[[A' up-line-or-beginning-search
-bindkey '^[[B' down-line-or-beginning-search
-bindkey -M vicmd 'k' up-line-or-beginning-search
-bindkey -M vicmd 'j' down-line-or-beginning-search
-
-#even for zsh
-bindkey -M viins 'kj' vi-cmd-mode
-
-# Units are 10ms. Long enough to type `kj` / ctrl-g chords, short enough that ESC
-# doesn't lag (was 100 = 1s).
-KEYTIMEOUT=30
-
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-#vim is the best
-export EDITOR="vim"
-export VISUAL="vim"
-
-# ---------------------------------------------------------------------------
-# Aliases & helpers
-# ---------------------------------------------------------------------------
-alias reload-zshrc='exec zsh'
-alias grip='grep -riI'
-#simple http server
-alias http='python3 -m http.server'
-#most common commands - useful for determining what else i should alias to save time
-alias mosthist="LC_ALL=C sed -E -n 's/^: [0-9]+:[0-9]+;//p' ~/.zsh_history | awk '{print \$1}' | sort | uniq -c | sort -rn | head -40"
-alias mosthist2="LC_ALL=C sed -E -n 's/^: [0-9]+:[0-9]+;//p' ~/.zsh_history | awk '{print \$1, \$2}' | sort | uniq -c | sort -rn | head -40"
-#recursive git status
-alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ && echo \"\nGIT STATUS IN ${dir//\.git/}\" && git status -s" ; done'
-#so many typos
-alias sl='ls'
-alias gti='git'
-alias gw='./gradlew'
-alias darn='yarn --pure-lockfile'
-
-# docker compose v2 (you type `docker compose ...` ~150x in history)
-alias dc='docker compose'
-alias dcu='docker compose up -d'
-alias dcs='docker compose stop'
-alias dcr='docker compose restart'
-alias dcl='docker compose logs -f --tail=200'
-alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
-
-alias python='python3'
-alias pes='pipenv shell'
-
-# omz in this fork predates git_main_branch; prefer origin/HEAD, then main, then master
-(( $+functions[git_main_branch] )) || git_main_branch() {
-  local ref=$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null)
-  [[ -n $ref ]] && { echo ${ref#origin/}; return }
-  git show-ref -q --verify refs/heads/main && echo main || echo master
-}
-
-# git: things you type a lot that omz doesn't cover (see `galias` for the rest)
-alias gs='git status'
-alias grim='git rebase -i origin/$(git_main_branch)'       # 36x `git rebase -i origin/master`
-alias grom='git rebase origin/$(git_main_branch)'
-alias gfm='git fetch origin $(git_main_branch)'
-alias gup='git fetch origin $(git_main_branch) && git merge origin/$(git_main_branch)'  # 49x merge origin/master
-alias gcm='git checkout $(git_main_branch)'
-alias gundo='git reset --soft HEAD~1'
-galias() { alias | grep -E '^g[a-z!]*=' | ${PAGER:-less} }
-
-# claude
-alias cl='claude'
-alias clr='claude --resume'
-alias clc='claude --continue'
-
-# Formatting aliases
-json() {
-  if (( $+commands[jq] )); then jq . "${@:--}"; else python3 -m json.tool "${@:--}"; fi
-}
-
-weather() { curl "wttr.in/${1}" }
-alias wthr='weather'
-
-#yarn stuff
-export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
-
-#commonslyusedstuff
-alias lsr='ls -lahtr'
-alias dust='du -hs * | sort -h'
-
-# ps | grep without matching the grep itself: `psg launch-kernel`
-psg() { ps aux | grep -i -- "[${1[1]}]${1[2,-1]}" }
-
-# what's listening on a port: `port 3000`
-port() { lsof -nP -iTCP${1:+:$1} -sTCP:LISTEN }
-
-# mkdir + cd
-mkcd() { mkdir -p -- "$1" && cd -- "$1" }
-
-#create a basic html file
-html() {
-  if [[ -z $1 ]]; then
-    echo "Enter a path to create a basic html file at."
-    return 1;
-  fi
-  cp ~/.template.html $1
-}
-
-# stash, update main, branch off it, unstash
-gscb() {
-  [[ -z $1 ]] && { echo "usage: gscb <new-branch>"; return 1 }
-  local main=$(git_main_branch) stashed=0
-  [[ -n $(git status --porcelain) ]] && git stash push -u -m "gscb $1" && stashed=1
-  git checkout "$main" && git pull && git checkout -b "$1"
-  (( stashed )) && git stash pop
-}
+# real location of this repo (~/.zshrc is a symlink into it)
+DOTFILES=${${(%):-%x}:A:h}
+# zsh plugins are cloned here by deploy.sh
+ZSH_PLUGINS=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins
 
 # Cache the output of slow `eval "$(tool init)"` style commands.
 # Regenerates when the tool binary changes. Use only for output that doesn't
@@ -198,31 +22,166 @@ cached_eval() {
   source $cache
 }
 
-source ~/.z.sh
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export EDITOR="vim"
+export VISUAL="vim"
+export AWS_PAGER=""
+DISABLE_UNTRACKED_FILES_DIRTY=true   # prompt: untracked files don't mark the repo dirty
 
-#fzf aliases
-source ~/.zshrc.fzf
-
-[ -f ~/.kubectl_aliases ] && source ~/.kubectl_aliases
-
-# load system specific overrides
+# system specific PATH, colors, aliases (darwin/ or linux-gnu/)
 source ~/.zshrc.system
 
-# load local overrides
-[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+source $DOTFILES/zsh/options.zsh
+source $DOTFILES/zsh/completion.zsh
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# key bindings that must be (re)applied after `fzf --zsh` (defined in zshrc.fzf)
-(( $+functions[fzf_post_init] )) && fzf_post_init
+# ---------------------------------------------------------------------------
+# Vi mode / keys
+# ---------------------------------------------------------------------------
+bindkey -v
 
-export AWS_PAGER=""
+# redraw prompt (vi mode indicator) on keymap change and terminal resize
+zle-keymap-select() { zle reset-prompt; zle -R }
+zle -N zle-keymap-select
+TRAPWINCH() { zle && { zle reset-prompt; zle -R } }
+
+# v in normal mode edits the command line in $EDITOR
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd 'v' edit-command-line
+
+bindkey '^P' up-history
+bindkey '^N' down-history
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+bindkey '^w' backward-kill-word
+bindkey '^[[3~' delete-char
+bindkey '^[[H' beginning-of-line '^[[F' end-of-line
+
+# type a prefix then up/down (or k/j in normal mode) to search history for it
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+bindkey -M vicmd 'k' up-line-or-beginning-search
+bindkey -M vicmd 'j' down-line-or-beginning-search
+
+bindkey -M viins 'kj' vi-cmd-mode
+
+# How long zsh waits for the next key of a multi-key binding (`kj`, ctrl-g
+# ctrl-b, ...) and after ESC. Units of 10ms: 30 = 300ms.
+KEYTIMEOUT=30
+
+# ---------------------------------------------------------------------------
+# Aliases & helpers
+# ---------------------------------------------------------------------------
+source $DOTFILES/zsh/git.zsh
+
+alias reload-zshrc='exec zsh'
+alias grip='grep -riI'
+alias http='python3 -m http.server'
+# most common commands - useful for deciding what else to alias
+alias mosthist="LC_ALL=C sed -E -n 's/^: [0-9]+:[0-9]+;//p' ~/.zsh_history | awk '{print \$1}' | sort | uniq -c | sort -rn | head -40"
+alias mosthist2="LC_ALL=C sed -E -n 's/^: [0-9]+:[0-9]+;//p' ~/.zsh_history | awk '{print \$1, \$2}' | sort | uniq -c | sort -rn | head -40"
+# recursive git status
+alias rgs='find . -type d -name ".git" | while read dir ; do sh -c "cd $dir/../ && echo \"\nGIT STATUS IN ${dir//\.git/}\" && git status -s" ; done'
+alias sl='ls'
+alias l='ls -lah'
+alias la='ls -lAh'
+alias ll='ls -lh'
+alias lsr='ls -lahtr'
+alias dust='du -hs * | sort -h'
+alias gw='./gradlew'
+alias darn='yarn --pure-lockfile'
+alias python='python3'
+alias pes='pipenv shell'
+
+# docker compose v2
+alias dc='docker compose'
+alias dcu='docker compose up -d'
+alias dcs='docker compose stop'
+alias dcr='docker compose restart'
+alias dcl='docker compose logs -f --tail=200'
+alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
+
+# claude
+alias cl='claude'
+alias clr='claude --resume'
+alias clc='claude --continue'
+
+json() {
+  if (( $+commands[jq] )); then jq . "${@:--}"; else python3 -m json.tool "${@:--}"; fi
+}
+weather() { curl "wttr.in/${1}" }
+alias wthr='weather'
+# ps | grep without matching the grep itself: `psg launch-kernel`
+psg() { ps aux | grep -i -- "[${1[1]}]${1[2,-1]}" }
+# what's listening on a port: `port 3000` (or all with no arg)
+port() { lsof -nP -iTCP${1:+:$1} -sTCP:LISTEN }
+mkcd() { mkdir -p -- "$1" && cd -- "$1" }
+# create a basic html file
+html() {
+  [[ -z $1 ]] && { echo "Enter a path to create a basic html file at."; return 1 }
+  cp ~/.template.html $1
+}
+
+export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
+
+# ---------------------------------------------------------------------------
+# Tools
+# ---------------------------------------------------------------------------
+# kube-ps1 only maintains $KUBE_PS1_CONTEXT for the prompt's kube segment
+if [[ -f ~/.kube-ps1/kube-ps1.sh ]]; then
+  source ~/.kube-ps1/kube-ps1.sh
+  export KUBE_PS1_NS_ENABLE=false KUBE_PS1_SYMBOL_ENABLE=false
+fi
+source $DOTFILES/zsh/prompt.zsh
+
+# fzf: brew's fzf, falling back to the old ~/.fzf git checkout
+(( $+commands[fzf] )) || { [[ -d ~/.fzf/bin ]] && path+=(~/.fzf/bin) }
+source ~/.zshrc.fzf
+cached_eval fzf fzf --zsh
+fzf_post_init
+
+# zoxide (`z foo`, `zi` / `j` to pick); falls back to z.sh
+if (( $+commands[zoxide] )); then
+  cached_eval zoxide zoxide init zsh
+  unfunction j 2>/dev/null; alias j='zi'
+elif [[ -f ~/.z.sh ]]; then
+  source ~/.z.sh
+fi
+
+[[ -f ~/.kubectl_aliases ]] && source ~/.kubectl_aliases
+
+# machine-local overrides (not in the repo)
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
 export PATH="$HOME/projects/hex/bin:$PATH"
-
-# Created by `pipx` on 2025-03-04 01:09:25
-export PATH="$PATH:$HOME/.local/bin"
-
+export PATH="$PATH:$HOME/.local/bin"   # pipx
 [[ -d ${KREW_ROOT:-$HOME/.krew} ]] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+typeset -U path PATH                   # dedupe
 
-# dedupe PATH (several files prepend the same dirs)
-typeset -U path PATH
+# ---------------------------------------------------------------------------
+# Plugins that wrap zle widgets: load last, syntax highlighting very last
+# ---------------------------------------------------------------------------
+if [[ -f $ZSH_PLUGINS/zsh-you-should-use/you-should-use.plugin.zsh ]]; then
+  YSU_MESSAGE_POSITION=after
+  YSU_IGNORED_ALIASES=(g gti sl l la ll python)
+  source $ZSH_PLUGINS/zsh-you-should-use/you-should-use.plugin.zsh
+  add-zsh-hook -D preexec _check_git_aliases   # shell aliases are enough; skip `git st` hints
+fi
+if [[ -f $ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+  ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=200
+  ZSH_AUTOSUGGEST_MANUAL_REBIND=1      # faster; widgets are bound once
+  source $ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh
+  bindkey '^ ' autosuggest-accept      # ctrl-space accepts (right-arrow / ctrl-e also work)
+fi
+[[ -f $ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] &&
+  source $ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+prompt_fix_hook_order   # direnv/kube-ps1 registered hooks after the prompt did
+
 #zprof
+

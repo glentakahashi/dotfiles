@@ -15,6 +15,7 @@
 # --------------------------------------------------------------------------
 # Defaults
 # --------------------------------------------------------------------------
+export BAT_THEME=${BAT_THEME:-"Solarized (dark)"}
 if (( $+commands[bat] )); then
   _fzf_cat='bat --color=always --style=numbers --line-range=:500'
 else
