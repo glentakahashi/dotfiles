@@ -101,6 +101,10 @@ alias dcr='docker compose restart'
 alias dcl='docker compose logs -f --tail=200'
 alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'
 
+# hex dev server (from `coach`: typed ~350x)
+alias hw='hdev watch'
+alias hwl='hdev watch:local'
+
 # claude
 alias cl='claude'
 alias clr='claude --resume'
