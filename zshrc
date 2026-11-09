@@ -181,6 +181,11 @@ fi
 [[ -f $ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] &&
   source $ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+# direnv last: it snapshots the environment when it loads a .envrc, so PATH
+# entries added after the hook (e.g. ~/.local/bin, where claude lives) went
+# missing inside direnv'd repos like hex.
+(( $+commands[direnv] )) && cached_eval direnv direnv hook zsh
+
 prompt_fix_hook_order   # direnv/kube-ps1 registered hooks after the prompt did
 
 #zprof
