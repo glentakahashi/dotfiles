@@ -139,6 +139,8 @@ source $DOTFILES/zsh/kubectl_aliases.zsh   # vendored ahmetb/kubectl-aliases
 # machine-local overrides (not in the repo)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
+source $DOTFILES/zsh/coach.zsh   # `coach`: shortcut suggestions from your history
+
 [[ -d ~/projects/hex/bin ]] && path=(~/projects/hex/bin $path)
 path+=(~/.local/bin)                   # uv tools, claude, copy (Linux puts it first)
 [[ -d ${KREW_ROOT:-$HOME/.krew} ]] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"

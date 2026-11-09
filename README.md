@@ -49,6 +49,7 @@ Nothing unreviewed gets downloaded and run:
 | `zsh/completion.zsh` | cached compinit + fzf-tab |
 | `zsh/prompt.zsh` | agnoster-style prompt (kube ctx, AWS profile, git, vi mode) |
 | `zsh/git.zsh` | git aliases (run `galias` to list them) |
+| `zsh/coach.zsh` | `coach`: shortcut suggestions from your history |
 | `zshrc.fzf` | fzf config + pickers (run `fzf-help`) |
 | `darwin/`, `linux-gnu/` | per-OS zsh/tmux overrides (locale, PATH, colors, `open` on WSL) |
 | `bin/copy` | clipboard from anywhere: pbcopy / wl-copy / xclip / clip.exe, or OSC 52 over ssh |
@@ -57,10 +58,12 @@ Nothing unreviewed gets downloaded and run:
 | `gitconfig`, `gitconfig.modern`, `gitconfig.hex` | git; settings needing git 2.35+; identity + fsmonitor for `~/projects/hex` |
 | `git/ignore` | global gitignore (`~/.config/git/ignore`), also read by rg and fd |
 | `ripgreprc` | rg defaults |
+| `config/direnv/direnv.toml` | direnv: keep "loading"/"using devbox", hide the env-var diff |
 | `cursor/` | Cursor settings, keybindings, extensions (`cursor/extensions.sh export` after adding some) |
 
 ## Cheat sheet
 
+- `coach`: what you typed the long way in the last 30 days (`-d 90` for more, `--claude` for ideas). A short digest also shows up once a week in the first new shell (`COACH_INTERVAL_DAYS=0` turns it off).
 - `galias`: git aliases. You'll also get a hint after typing a long command that has an alias (zsh-you-should-use).
 - `fzf-help`: fzf functions. Most used: `fco` (branch), `gfv`/`frg` (grep → vim), `fga` (stage files), `fkx`/`fkl` (pod shell/logs), `fport`.
 - `ctrl-g ctrl-b` / `ctrl-h` / `ctrl-f` / `ctrl-s` / `ctrl-t`: insert branch / commit / changed file / stash / tag at the cursor.
