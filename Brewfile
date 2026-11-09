@@ -17,8 +17,14 @@ brew "wget"
 brew "watch"
 
 # k8s pickers (fkx, fkl, fhh...) and prompt context
+brew "kubernetes-cli" # listed explicitly: brew had it as an orphaned dependency and autoremove removed it
 brew "kubectx"
 brew "helm"
+brew "k9s"           # cluster TUI
+brew "stern"         # tail logs across pods: stern <deploy-name>
+
+# python CLI tools: `uv tool install <pkg>` (replaces pipx)
+brew "uv"
 
 # Terminal. Skipped when already installed outside brew, since `brew` refuses
 # to overwrite an existing app/font.

@@ -153,7 +153,7 @@ source $DOTFILES/zsh/kubectl_aliases.zsh   # vendored ahmetb/kubectl-aliases
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 export PATH="$HOME/projects/hex/bin:$PATH"
-export PATH="$PATH:$HOME/.local/bin"   # pipx
+export PATH="$PATH:$HOME/.local/bin"   # uv tools, claude
 [[ -d ${KREW_ROOT:-$HOME/.krew} ]] && export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 typeset -U path PATH                   # dedupe
 
