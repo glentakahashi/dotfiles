@@ -91,9 +91,7 @@ alias ll='ls -lh'
 alias lsr='ls -lahtr'
 alias dust='du -hs * | sort -h'
 alias gw='./gradlew'
-alias darn='yarn --pure-lockfile'
 alias python='python3'
-alias pes='pipenv shell'
 
 # docker compose v2
 alias dc='docker compose'
@@ -111,15 +109,12 @@ alias clc='claude --continue'
 json() {
   if (( $+commands[jq] )); then jq . "${@:--}"; else python3 -m json.tool "${@:--}"; fi
 }
-weather() { curl "wttr.in/${1}" }
-alias wthr='weather'
 # ps | grep without matching the grep itself: `psg launch-kernel`
 psg() { ps aux | grep -i -- "[${1[1]}]${1[2,-1]}" }
 # what's listening on a port: `port 3000` (or all with no arg)
 port() { lsof -nP -iTCP${1:+:$1} -sTCP:LISTEN }
 mkcd() { mkdir -p -- "$1" && cd -- "$1" }
 
-[[ -d ~/.yarn/bin ]] && path=(~/.yarn/bin $path)
 
 # ---------------------------------------------------------------------------
 # Tools
@@ -127,19 +122,16 @@ mkcd() { mkdir -p -- "$1" && cd -- "$1" }
 source $DOTFILES/zsh/prompt.zsh
 
 # fzf: brew's fzf, falling back to the old ~/.fzf git checkout
-(( $+commands[fzf] )) || { [[ -d ~/.fzf/bin ]] && path+=(~/.fzf/bin) }
 source ~/.zshrc.fzf
 cached_eval fzf fzf --zsh
 (( $+commands[fzf] && ! $+widgets[fzf-history-widget] )) &&
   print -u2 "zshrc: fzf $(fzf --version 2>/dev/null | cut -d' ' -f1) is too old for its key bindings (needs 0.48+); run $DOTFILES/deploy.sh"
 fzf_post_init
 
-# zoxide (`z foo`, `zi` / `j` to pick); falls back to z.sh
+# zoxide (`z foo`, `zi` / `j` to pick)
 if (( $+commands[zoxide] )); then
   cached_eval zoxide zoxide init zsh
   unfunction j 2>/dev/null; alias j='zi'
-elif [[ -f ~/.z.sh ]]; then
-  source ~/.z.sh
 fi
 
 source $DOTFILES/zsh/kubectl_aliases.zsh   # vendored ahmetb/kubectl-aliases

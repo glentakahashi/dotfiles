@@ -286,9 +286,9 @@ command -v vim >/dev/null && vim -N -u NONE -es +'helptags ALL' +'qa!' </dev/nul
 ok "plugins match plugins.lock"
 link "$DOTFILES/dircolors.ansi-dark" ~/.dircolors
 
-# one-time: carry z.sh history over to zoxide
+# one-time on older machines: carry z.sh history over to zoxide
 if command -v zoxide >/dev/null && [[ -s ~/.z ]] && [[ -z "$(zoxide query -l 2>/dev/null | head -1)" ]]; then
-  zoxide import --from=z ~/.z && ok "imported ~/.z into zoxide"
+  zoxide import --from=z ~/.z && ok "imported ~/.z into zoxide (delete ~/.z when happy)"
 fi
 
 # init scripts are cached by zshrc's cached_eval; clear so they regenerate

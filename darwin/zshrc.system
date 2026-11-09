@@ -23,6 +23,3 @@ alias egrep="grep -E --color=auto"
 #we cannot export those because it screws over terminal encoding
 alias sed="LC_ALL=C sed"
 
-function giffy() {
-    ffmpeg -i $1 -s 600x400 -pix_fmt rgb24 -r 10 -f gif - | gifsicle --optimize=3 --delay=3 > $2
-}

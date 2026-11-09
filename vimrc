@@ -245,16 +245,8 @@ nmap <leader>f9 :set foldlevel=9<CR>
 vnoremap < <gv
 vnoremap > >gv
 
-" Fugitive {
-nnoremap <silent> <leader>gs :Git<CR>
-nnoremap <silent> <leader>gd :Gdiffsplit<CR>
-nnoremap <silent> <leader>gc :Git commit<CR>
-nnoremap <silent> <leader>gb :Git blame<CR>
-nnoremap <silent> <leader>gl :Gclog<CR>
-nnoremap <silent> <leader>gp :Git push<CR>
-nnoremap <silent> <leader>gw :Gwrite<CR>:GitGutter<CR>
+" gitgutter: ]c / [c next/previous change, ,gg toggle signs
 nnoremap <silent> <leader>gg :GitGutterToggle<CR>
-"}
 
 " NerdTree {
 map <C-e> :NERDTreeToggle<CR>:NERDTreeMirror<CR>
