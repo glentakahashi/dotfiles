@@ -1,0 +1,13 @@
+# Third-party code that gets sourced into my shell/tmux, pinned by commit.
+# deploy.sh checks out exactly these; `./deploy.sh --update` bumps them to the
+# latest upstream commit and prints compare links so you can review the diff.
+#
+# kind  name                     url                                              commit
+zsh     fzf-tab                  https://github.com/Aloxaf/fzf-tab                     24105b15714bfec37989ed5c5b6e60f572253019
+zsh     zsh-autosuggestions      https://github.com/zsh-users/zsh-autosuggestions      85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5
+zsh     zsh-syntax-highlighting  https://github.com/zsh-users/zsh-syntax-highlighting  e6683f20e5c38d3e5447f45845d04ddda75d0f23
+zsh     zsh-you-should-use       https://github.com/MichaelAquilina/zsh-you-should-use 5f3d129864ee4505043d88c3486224f1d75b692e
+tmux    tmux-battery             https://github.com/tmux-plugins/tmux-battery          43832651ede43f54dcf0588727c1957fe648d57d
+tmux    tmux-resurrect           https://github.com/tmux-plugins/tmux-resurrect        cff343cf9e81983d3da0c8562b01616f12e8d548
+tmux    tmux-continuum           https://github.com/tmux-plugins/tmux-continuum        0698e8f4b17d6454c71bf5212895ec055c578da0
+tmux    tmux-yank                https://github.com/tmux-plugins/tmux-yank             acfd36e4fcba99f8310a7dfb432111c242fe7392

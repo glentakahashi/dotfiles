@@ -57,10 +57,29 @@ prompt_virtualenv() {
   [[ -n $VIRTUAL_ENV && -n $VIRTUAL_ENV_DISABLE_PROMPT ]] && prompt_segment blue black "(${VIRTUAL_ENV:t})"
 }
 
-# kube context from kube-ps1's cache; red if it looks like prod
+# current kube context, read straight from the kubeconfig file(s) and cached
+# until their mtime changes (replaces kube-ps1; `kubectl config` costs ~50ms)
+zmodload -F zsh/stat b:zstat 2>/dev/null
+_prompt_kube_update() {
+  local -a files=(${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}) st
+  local f key= line
+  for f in $files; do
+    [[ -r $f ]] && zstat -A st +mtime -- $f 2>/dev/null && key+="$f@$st[1];"
+  done
+  [[ $key == $_prompt_kube_key ]] && return
+  _prompt_kube_key=$key _prompt_kube_ctx=
+  for f in $files; do
+    [[ -r $f ]] || continue
+    line=${${(M)${(f)"$(<$f)"}:#current-context:*}[1]}
+    line=${${line#current-context:}//[\"\' ]/}
+    [[ -n $line ]] && { _prompt_kube_ctx=${line##*/}; return }
+  done
+}
+
+# kube context; red if it looks like prod
 prompt_kubectl() {
-  local ctx=${KUBE_PS1_CONTEXT#*/}
-  [[ -z $ctx || $ctx == N/A ]] && return
+  local ctx=$_prompt_kube_ctx
+  [[ -z $ctx ]] && return
   case $ctx in
     *-prod*|*production*) prompt_segment red yellow "$ctx" ;;
     *)                    prompt_segment green black "$ctx" ;;
@@ -157,10 +176,10 @@ _prompt_build_mode() {
 }
 
 # Two hooks: save $? before any other precmd hook (direnv etc.) clobbers it,
-# and build the prompt after the others (kube-ps1 updates $KUBE_PS1_CONTEXT).
+# and build the prompt after the others (direnv may change the environment).
 # Order is enforced by prompt_fix_hook_order, called at the end of zshrc.
 _prompt_save_status() { _prompt_retval=$? }
-_prompt_precmd()      { _prompt_top=$(_prompt_build_top) }
+_prompt_precmd()      { _prompt_kube_update; _prompt_top=$(_prompt_build_top) }
 prompt_fix_hook_order() {
   precmd_functions=(_prompt_save_status
     ${precmd_functions:#(_prompt_save_status|_prompt_precmd)} _prompt_precmd)

@@ -4,10 +4,14 @@
 #   ./deploy.sh              everything
 #   ./deploy.sh --no-brew    skip brew bundle (packages)
 #   ./deploy.sh --no-vim     skip vim-plug install/update
+#   ./deploy.sh --update     also bump pinned third-party code (plugins.lock,
+#                            vendored files, vim plugins) to latest upstream;
+#                            review with `git diff` and commit
 #
 # - Existing real files are moved to <file>.bak.<timestamp> before linking;
 #   correct symlinks are left alone.
-# - Git repos (plugins etc.) are cloned if missing, fast-forwarded otherwise.
+# - Third-party plugins are checked out at the commits in plugins.lock, so
+#   nothing unreviewed gets sourced into the shell.
 set -uo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,12 +20,13 @@ case "$OSTYPE" in
   *)       SYSTEM=linux-gnu ;;
 esac
 STAMP=$(date +%Y%m%d-%H%M%S)
-DO_BREW=1 DO_VIM=1
+DO_BREW=1 DO_VIM=1 DO_UPDATE=0
 for arg in "$@"; do
   case $arg in
     --no-brew) DO_BREW=0 ;;
     --no-vim)  DO_VIM=0 ;;
-    -h|--help) sed -n '2,10p' "$0"; exit 0 ;;
+    --update)  DO_UPDATE=1 ;;
+    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
     *) echo "unknown option: $arg" >&2; exit 1 ;;
   esac
 done
@@ -46,15 +51,39 @@ link() {
   ln -s "$src" "$dst" && ok "linked $dst"
 }
 
-# sync_repo <url> <dir>
-sync_repo() {
-  local url=$1 dir=$2
-  if [[ -d $dir/.git ]]; then
-    git -C "$dir" pull --ff-only -q 2>/dev/null && ok "updated ${dir/#$HOME/~}" || warn "could not update $dir"
-  else
-    mkdir -p "$(dirname "$dir")"
-    git clone -q --depth 1 "$url" "$dir" && ok "cloned ${dir/#$HOME/~}" || warn "could not clone $url"
+# pin_repo <url> <dir> <commit>: make <dir> a checkout of exactly <commit>
+pin_repo() {
+  local url=$1 dir=$2 sha=$3
+  if [[ ! -d $dir/.git ]]; then
+    [[ -e $dir ]] && mv "$dir" "$dir.bak.$STAMP"
+    git init -q "$dir" && git -C "$dir" remote add origin "$url"
   fi
+  git -C "$dir" remote set-url origin "$url"
+  [[ "$(git -C "$dir" rev-parse -q --verify HEAD 2>/dev/null)" == "$sha" ]] && return 0
+  if git -C "$dir" fetch -q --depth 1 origin "$sha" 2>/dev/null &&
+     git -C "$dir" -c advice.detachedHead=false checkout -q --force "$sha"; then
+    ok "${dir/#$HOME/~} @ ${sha:0:10}"
+  else
+    warn "could not check out $url @ $sha"
+  fi
+}
+
+# bump_lock: rewrite plugins.lock with each repo's latest upstream commit
+bump_lock() {
+  local lock=$DOTFILES/plugins.lock tmp kind name url sha new
+  tmp=$(mktemp)
+  while IFS= read -r line; do
+    if [[ $line =~ ^[[:space:]]*(#|$) ]]; then echo "$line" >> "$tmp"; continue; fi
+    read -r kind name url sha <<<"$line"
+    new=$(git ls-remote "$url" HEAD 2>/dev/null | cut -f1)
+    if [[ -z $new ]]; then
+      warn "could not reach $url"; new=$sha
+    elif [[ $new != "$sha" ]]; then
+      ok "$name: ${url%.git}/compare/${sha:0:10}...${new:0:10}"
+    fi
+    printf '%-7s %-24s %-53s %s\n' "$kind" "$name" "$url" "$new" >> "$tmp"
+  done < "$lock"
+  mv "$tmp" "$lock"
 }
 
 # fetch <url> <file>: download, only replacing the file on success
@@ -127,16 +156,34 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-step "Shell plugins and helpers"
-PLUGINS=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins
-sync_repo https://github.com/Aloxaf/fzf-tab                      "$PLUGINS/fzf-tab"
-sync_repo https://github.com/zsh-users/zsh-autosuggestions       "$PLUGINS/zsh-autosuggestions"
-sync_repo https://github.com/zsh-users/zsh-syntax-highlighting   "$PLUGINS/zsh-syntax-highlighting"
-sync_repo https://github.com/MichaelAquilina/zsh-you-should-use  "$PLUGINS/zsh-you-should-use"
-sync_repo https://github.com/jonmosco/kube-ps1                   ~/.kube-ps1
-sync_repo https://github.com/seebi/dircolors-solarized           ~/.dircolors-solarized
-link ~/.dircolors-solarized/dircolors.ansi-dark ~/.dircolors
-fetch https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases ~/.kubectl_aliases
+step "Pinned plugins (plugins.lock)"
+if (( DO_UPDATE )); then
+  bump_lock
+  # vendored single files: refresh, then review with `git diff`
+  vendor() {  # vendor <raw url> <repo file> <header lines to keep>
+    local tmp; tmp=$(mktemp)
+    if curl -fsSL "$1" -o "$tmp"; then
+      { head -n "$3" "$DOTFILES/$2"; cat "$tmp"; } > "$tmp.new" && mv "$tmp.new" "$DOTFILES/$2"
+      ok "refreshed $2 (update the commit in its header if it changed)"
+    else
+      warn "could not download $1"
+    fi
+    rm -f "$tmp"
+  }
+  vendor https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases zsh/kubectl_aliases.zsh 2
+  vendor https://raw.githubusercontent.com/seebi/dircolors-solarized/master/dircolors.ansi-dark dircolors.ansi-dark 2
+fi
+ZSH_PLUGIN_DIR=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins
+while read -r kind name url sha; do
+  [[ -z $kind || $kind == \#* ]] && continue
+  case $kind in
+    zsh)  pin_repo "$url" "$ZSH_PLUGIN_DIR/$name" "$sha" ;;
+    tmux) pin_repo "$url" "$HOME/.tmux/plugins/$name" "$sha" ;;
+    *)    warn "unknown kind '$kind' in plugins.lock" ;;
+  esac
+done < "$DOTFILES/plugins.lock"
+ok "plugins match plugins.lock"
+link "$DOTFILES/dircolors.ansi-dark" ~/.dircolors
 
 # one-time: carry z.sh history over to zoxide
 if command -v zoxide >/dev/null && [[ -s ~/.z ]] && [[ -z "$(zoxide query -l 2>/dev/null | head -1)" ]]; then
@@ -145,12 +192,6 @@ fi
 
 # init scripts are cached by zshrc's cached_eval; clear so they regenerate
 rm -f "${XDG_CACHE_HOME:-$HOME/.cache}"/zsh/eval-*.zsh
-
-# ---------------------------------------------------------------------------
-step "tmux plugins"
-sync_repo https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-~/.tmux/plugins/tpm/bin/install_plugins >/dev/null && ok "tpm install" || warn "tpm install"
-~/.tmux/plugins/tpm/bin/update_plugins all >/dev/null && ok "tpm update" || warn "tpm update"
 
 # ---------------------------------------------------------------------------
 if (( DO_VIM )); then
@@ -175,7 +216,9 @@ fi
 
 # ---------------------------------------------------------------------------
 step "Done"
-[[ -d ~/.oh-my-zsh ]] && echo "  note: ~/.oh-my-zsh is no longer used; delete it when happy: rm -rf ~/.oh-my-zsh"
+for old in ~/.oh-my-zsh ~/.kube-ps1 ~/.dircolors-solarized ~/.tmux/plugins/tpm ~/.tmux/plugins/tmux-colors-solarized ~/.kubectl_aliases ~/.z.sh; do
+  [[ -e $old ]] && echo "  note: ${old/#$HOME/~} is no longer used; delete when happy: rm -rf ${old/#$HOME/~}"
+done
 [[ -d ~/.fzf ]] && command -v brew >/dev/null && brew list fzf >/dev/null 2>&1 &&
   echo "  note: ~/.fzf (git install) is superseded by brew's fzf; remove with: rm -rf ~/.fzf ~/.fzf.zsh ~/.fzf.bash"
 if (( ${#FAILED[@]} )); then

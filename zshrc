@@ -131,11 +131,6 @@ export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
 # ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
-# kube-ps1 only maintains $KUBE_PS1_CONTEXT for the prompt's kube segment
-if [[ -f ~/.kube-ps1/kube-ps1.sh ]]; then
-  source ~/.kube-ps1/kube-ps1.sh
-  export KUBE_PS1_NS_ENABLE=false KUBE_PS1_SYMBOL_ENABLE=false
-fi
 source $DOTFILES/zsh/prompt.zsh
 
 # fzf: brew's fzf, falling back to the old ~/.fzf git checkout
@@ -152,7 +147,7 @@ elif [[ -f ~/.z.sh ]]; then
   source ~/.z.sh
 fi
 
-[[ -f ~/.kubectl_aliases ]] && source ~/.kubectl_aliases
+source $DOTFILES/zsh/kubectl_aliases.zsh   # vendored ahmetb/kubectl-aliases
 
 # machine-local overrides (not in the repo)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
@@ -186,7 +181,7 @@ fi
 # missing inside direnv'd repos like hex.
 (( $+commands[direnv] )) && cached_eval direnv direnv hook zsh
 
-prompt_fix_hook_order   # direnv/kube-ps1 registered hooks after the prompt did
+prompt_fix_hook_order   # direnv etc. registered hooks after the prompt did
 
 #zprof
 
