@@ -3,10 +3,9 @@
 #
 #   ./deploy.sh              everything
 #   ./deploy.sh --no-brew    skip brew bundle (packages)
-#   ./deploy.sh --no-vim     skip vim-plug install/update
 #   ./deploy.sh --update     also bump pinned third-party code (plugins.lock,
-#                            vendored files, vim plugins) to latest upstream;
-#                            review with `git diff` and commit
+#                            vendored files) to latest upstream; review with
+#                            `git diff` and commit
 #
 # - Existing real files are moved to <file>.bak.<timestamp> before linking;
 #   correct symlinks are left alone.
@@ -20,11 +19,11 @@ case "$OSTYPE" in
   *)       SYSTEM=linux-gnu ;;
 esac
 STAMP=$(date +%Y%m%d-%H%M%S)
-DO_BREW=1 DO_VIM=1 DO_UPDATE=0
+DO_BREW=1 DO_UPDATE=0
 for arg in "$@"; do
   case $arg in
     --no-brew) DO_BREW=0 ;;
-    --no-vim)  DO_VIM=0 ;;
+    --no-vim)  ;;   # vim plugins are part of plugins.lock now; kept for old muscle memory
     --update)  DO_UPDATE=1 ;;
     -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
     *) echo "unknown option: $arg" >&2; exit 1 ;;
@@ -125,7 +124,7 @@ link "$DOTFILES/$SYSTEM/zshrc.system"       ~/.zshrc.system
 link "$DOTFILES/tmux.conf"                  ~/.tmux.conf
 link "$DOTFILES/$SYSTEM/tmux.system.conf"   ~/.tmux.system.conf
 link "$DOTFILES/vimrc"                      ~/.vimrc
-link "$DOTFILES/vimplug"                    ~/.vimplug
+link "$DOTFILES/vim/colors/solarized8.vim" ~/.vim/colors/solarized8.vim
 link "$DOTFILES/template.html"              ~/.template.html
 link "$DOTFILES/agignore"                   ~/.agignore
 if [[ $SYSTEM == darwin ]]; then
@@ -177,14 +176,24 @@ if (( DO_UPDATE )); then
   vendor https://raw.githubusercontent.com/seebi/dircolors-solarized/master/dircolors.ansi-dark dircolors.ansi-dark 2
 fi
 ZSH_PLUGIN_DIR=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins
+VIM_PACK_DIR=$HOME/.vim/pack/plugins/start
+vim_wanted=()
 while read -r kind name url sha; do
   [[ -z $kind || $kind == \#* ]] && continue
   case $kind in
     zsh)  pin_repo "$url" "$ZSH_PLUGIN_DIR/$name" "$sha" ;;
     tmux) pin_repo "$url" "$HOME/.tmux/plugins/$name" "$sha" ;;
+    vim)  pin_repo "$url" "$VIM_PACK_DIR/$name" "$sha"; vim_wanted+=("$name") ;;
     *)    warn "unknown kind '$kind' in plugins.lock" ;;
   esac
 done < "$DOTFILES/plugins.lock"
+# vim loads everything in pack/*/start, so remove plugins dropped from the lock
+for d in "$VIM_PACK_DIR"/*/; do
+  [[ -d $d ]] || continue
+  n=$(basename "$d")
+  [[ " ${vim_wanted[*]} " == *" $n "* ]] || { rm -rf "$d" && ok "removed vim plugin $n (not in plugins.lock)"; }
+done
+command -v vim >/dev/null && vim -N -u NONE -es +'helptags ALL' +'qa!' </dev/null >/dev/null 2>&1
 ok "plugins match plugins.lock"
 link "$DOTFILES/dircolors.ansi-dark" ~/.dircolors
 
@@ -195,28 +204,6 @@ fi
 
 # init scripts are cached by zshrc's cached_eval; clear so they regenerate
 rm -f "${XDG_CACHE_HOME:-$HOME/.cache}"/zsh/eval-*.zsh
-
-# ---------------------------------------------------------------------------
-if (( DO_VIM )); then
-  step "vim plugins"
-  [[ -f ~/.vim/autoload/plug.vim ]] ||
-    fetch https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ~/.vim/autoload/plug.vim
-  # not -Es: vim-plug's UI raises harmless E31 errors in Ex mode
-  if (( DO_UPDATE )); then
-    vim -N -u ~/.vimrc +'PlugClean!' +'PlugUpdate --sync' +"PlugSnapshot! $DOTFILES/vimplug.lock" +'qa!' </dev/null >/dev/null 2>&1
-    ok "PlugUpdate; new commits written to vimplug.lock"
-  else
-    vim -N -u ~/.vimrc +'PlugClean!' +'PlugInstall --sync' +'qa!' </dev/null >/dev/null 2>&1
-    # check out the commits recorded in vimplug.lock (vim-plug's own restore is async)
-    sed -nE "s/.*g:plugs\['([^']+)'\]\.commit = '([0-9a-f]+)'.*/\1 \2/p" "$DOTFILES/vimplug.lock" |
-    while read -r name sha; do
-      dir=~/.vim/plugged/$name
-      [[ -d $dir/.git ]] || { warn "vim plugin $name missing"; continue; }
-      pin_repo "$(git -C "$dir" remote get-url origin)" "$dir" "$sha"
-    done
-    ok "vim plugins match vimplug.lock"
-  fi
-fi
 
 # ---------------------------------------------------------------------------
 if [[ $SYSTEM == darwin ]]; then
@@ -231,7 +218,7 @@ fi
 
 # ---------------------------------------------------------------------------
 step "Done"
-for old in ~/.oh-my-zsh ~/.kube-ps1 ~/.dircolors-solarized ~/.tmux/plugins/tpm ~/.tmux/plugins/tmux-colors-solarized ~/.kubectl_aliases ~/.z.sh; do
+for old in ~/.vim/plugged ~/.vim/autoload/plug.vim ~/.vimplug ~/.oh-my-zsh ~/.kube-ps1 ~/.dircolors-solarized ~/.tmux/plugins/tpm ~/.tmux/plugins/tmux-colors-solarized ~/.kubectl_aliases ~/.z.sh; do
   [[ -e $old ]] && echo "  note: ${old/#$HOME/~} is no longer used; delete when happy: rm -rf ${old/#$HOME/~}"
 done
 [[ -d ~/.fzf ]] && command -v brew >/dev/null && brew list fzf >/dev/null 2>&1 &&

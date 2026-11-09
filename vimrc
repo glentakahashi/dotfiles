@@ -1,7 +1,9 @@
 set nocompatible
 scriptencoding utf-8
 
-source ~/.vimplug
+" Plugins are vim's own packages: deploy.sh checks them out at the commits in
+" plugins.lock into ~/.vim/pack/plugins/start/, and vim loads them after this file.
+filetype plugin indent on
 
 let mapleader = ','
 set timeoutlen=1000 ttimeoutlen=0
