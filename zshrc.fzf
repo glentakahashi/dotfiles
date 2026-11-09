@@ -57,6 +57,10 @@ export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
 
 export FZF_DEFAULT_OPTS="--height 50% --layout=reverse --border --info=inline-right --cycle
   --bind 'ctrl-/:toggle-preview,alt-j:preview-down,alt-k:preview-up,alt-a:toggle-all'"
+# Inside tmux, open fzf in a floating popup instead of inline (fzf >= 0.53,
+# tmux >= 3.3). Outside tmux the option is ignored. Set FZF_NO_POPUP=1 in
+# ~/.zshrc.local to turn it off.
+[[ -n $TMUX && -z $FZF_NO_POPUP ]] && FZF_DEFAULT_OPTS+=" --tmux center,85%,75%"
 export FZF_CTRL_T_OPTS="--preview '$_fzf_preview' --preview-window 'right,55%,<100(down,50%)'"
 export FZF_ALT_C_OPTS="--preview 'ls -la --color=always {}'"
 export FZF_CTRL_R_OPTS="--bind 'ctrl-y:execute-silent(echo -n {2..} | $_fzf_copy)+abort'

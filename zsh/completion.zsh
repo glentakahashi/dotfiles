@@ -35,6 +35,8 @@ if [[ -f $ZSH_PLUGINS/fzf-tab/fzf-tab.plugin.zsh ]]; then
   source $ZSH_PLUGINS/fzf-tab/fzf-tab.plugin.zsh
   zstyle ':fzf-tab:*' switch-group '<' '>'
   zstyle ':fzf-tab:*' fzf-flags --height=50%
+  # match zshrc.fzf: tab completion in a tmux popup too
+  [[ -n $TMUX && -z $FZF_NO_POPUP ]] && zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
   zstyle ':fzf-tab:complete:(cd|z|ls|vim|cat|bat):*' fzf-preview \
     '[[ -d $realpath ]] && ls -1 --color=always $realpath || head -100 $realpath'
   zstyle ':fzf-tab:complete:git-(checkout|switch|rebase|merge|log|diff):*' fzf-preview \
