@@ -1,0 +1,7 @@
+# Included by gitconfig for repos under ~/projects/hex/
+[user]
+  email = glen@hex.tech
+
+[core]
+  fsmonitor = true
+  untrackedCache = true

@@ -4,6 +4,18 @@
 
 [core]
   editor = vim
+  # delta when installed, plain less otherwise (e.g. a fresh Linux box)
+  pager = "if command -v delta >/dev/null 2>&1; then delta; else less -FRX; fi"
+
+[interactive]
+  # colorized hunks in `git add -p` (same fallback as core.pager)
+  diffFilter = "if command -v delta >/dev/null 2>&1; then delta --color-only; else cat; fi"
+
+[delta]
+  navigate = true          # n / N jump between files in the pager
+  line-numbers = true
+  syntax-theme = Solarized (dark)
+  hyperlinks = true        # file paths are clickable in iTerm
 
 [color]
   diff = auto
@@ -61,6 +73,17 @@
 
 [push]
   autoSetupRemote = true
+  followTags = true
+
+[commit]
+  # show the diff below the message in the commit editor
+  verbose = true
+
+[column]
+  ui = auto
+
+[tag]
+  sort = version:refname
 
 [fetch]
   prune = true
@@ -72,6 +95,7 @@
 [rerere]
   # remember conflict resolutions; helps with repeated rebases onto master
   enabled = true
+  autoupdate = true
 
 [diff]
   algorithm = histogram
@@ -82,3 +106,8 @@
 
 [branch]
   sort = -committerdate
+
+# Work repos: hex.tech identity + fsmonitor (git status in hex: ~200ms -> ~45ms).
+# gitdir matches the main checkout and its worktrees.
+[includeIf "gitdir:~/projects/hex/"]
+  path = ~/projects/dotfiles/gitconfig.hex

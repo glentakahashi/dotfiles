@@ -9,6 +9,7 @@ brew "bat"
 brew "zoxide"
 brew "jq"
 brew "yq"
+brew "git-delta"     # git pager / add -p highlighting (gitconfig falls back to less without it)
 brew "coreutils"     # GNU ls/dircolors (darwin/zshrc.system puts gnubin first)
 brew "tmux"
 brew "vim"
