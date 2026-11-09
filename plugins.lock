@@ -20,6 +20,7 @@ vim     vim-airline-themes       https://github.com/vim-airline/vim-airline-them
 vim     numbers.vim              https://github.com/myusuf3/numbers.vim                9657aed1d9eeff7e9c0ac2a97db60f1e4e47fe4d
 vim     vim-indent-guides        https://github.com/preservim/vim-indent-guides        a1e1390c0136e63e813d051de2003bf0ee18ae30
 vim     vim-sleuth               https://github.com/tpope/vim-sleuth                   be69bff86754b1aa5adcbb527d7fcd1635a84080
+vim     vim-fugitive             https://github.com/tpope/vim-fugitive                 3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0
 vim     vim-gitgutter            https://github.com/airblade/vim-gitgutter             90b75207bd9b55d8ac4af15f72b4e935462014d0
 vim     nerdtree                 https://github.com/preservim/nerdtree                 690d061b591525890f1471c6675bcb5bdc8cdff9
 vim     vim-tmux-navigator       https://github.com/christoomey/vim-tmux-navigator     e41c431a0c7b7388ae7ba341f01a0d217eb3a432
