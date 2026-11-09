@@ -1,0 +1,21 @@
+{
+  "window.commandCenter": 1,
+  "sync.gist": "87e380a90817647e3e96bf4ab193ba23",
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.activityBar.orientation": "vertical",
+  "workbench.colorTheme": "Visual Studio Dark",
+  "workbench.preferredDarkColorTheme": "Visual Studio Dark",
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "terminal.integrated.automationProfile.osx": {
+    "path": "/bin/zsh",
+    "args": ["-c"],
+    "env": {
+      "DIRENV_DISABLE": "1"
+    }
+  },
+  "window.autoDetectColorScheme": false,
+  "python.defaultInterpreterPath": "/Users/glen/projects/hex/.devbox/nix/profile/default/bin/python",
+  "cursor.composer.queueMessageDefaultBehavior": "steer"
+}
