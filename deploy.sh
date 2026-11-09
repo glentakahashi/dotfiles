@@ -63,6 +63,7 @@ backupIfNotSymlink ~/.vim
 backupIfNotSymlink ~/.zsh
 backupIfNotSymlink ~/Library/Application\ Support/Code/User/settings.json
 backupIfNotSymlink ~/.template.html
+backupIfNotSymlink ~/.agignore
 
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 git clone https://github.com/seebi/dircolors-solarized ~/.dircolors-solarized
@@ -81,6 +82,7 @@ ln -v -s $SCRIPTPATH/zshrc ~/.zshrc
 ln -v -s $SCRIPTPATH/zshrc.fzf ~/.zshrc.fzf
 ln -v -s ~/.dircolors-solarized/dircolors.ansi-dark ~/.dircolors
 ln -v -s $SCRIPTPATH/template.html ~/.template.html
+ln -v -s $SCRIPTPATH/agignore ~/.agignore
 #ln -v -s $SCRIPTPATH/gitconfig ~/.gitconfig
 #COPY GITCONFIG BECAUSE IF ITS BROKEN ITS ANNOYING TO MERGE
 cp -v $SCRIPTPATH/gitconfig ~/.gitconfig
