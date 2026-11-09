@@ -143,8 +143,17 @@ if (( DO_BREW )); then
   if [[ $SYSTEM == darwin ]]; then
     step "Homebrew packages (Brewfile)"
     if ! command -v brew >/dev/null; then
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-      eval "$(/opt/homebrew/bin/brew shellenv)"
+      # the installer at a reviewed commit, checked by sha256 (not HEAD piped into bash)
+      brew_commit=7986efac25016e41eed7e471666140c06f9d97cf
+      brew_sha=5f333bbe53bc490e51e7ccb1df8779b3dd6ee73a1a7379efda216edb08ccb148
+      tmp=$(mktemp)
+      curl -fsSL "https://raw.githubusercontent.com/Homebrew/install/$brew_commit/install.sh" -o "$tmp"
+      if [[ "$(shasum -a 256 "$tmp" | cut -d' ' -f1)" == "$brew_sha" ]]; then
+        /bin/bash "$tmp" && eval "$(/opt/homebrew/bin/brew shellenv)"
+      else
+        warn "Homebrew installer sha256 mismatch; not running it"
+      fi
+      rm -f "$tmp"
     fi
     brew bundle --file="$DOTFILES/Brewfile" && ok "brew bundle" || warn "brew bundle had failures"
   elif [[ $SYSTEM == linux-gnu ]]; then
@@ -235,19 +244,25 @@ fi
 step "Pinned plugins (plugins.lock)"
 if (( DO_UPDATE )); then
   bump_lock
-  # vendored single files: refresh, then review with `git diff`
-  vendor() {  # vendor <raw url> <repo file> <header lines to keep>
-    local tmp; tmp=$(mktemp)
-    if curl -fsSL "$1" -o "$tmp"; then
-      { head -n "$3" "$DOTFILES/$2"; cat "$tmp"; } > "$tmp.new" && mv "$tmp.new" "$DOTFILES/$2"
-      ok "refreshed $2 (update the commit in its header if it changed)"
+  # vendored single files: re-download at upstream's current commit (recorded in
+  # the header), then review with `git diff`
+  vendor() {  # vendor <owner/repo> <path in repo> <file in this repo>
+    local repo=$1 path=$2 dst=$DOTFILES/$3 sha tmp
+    sha=$(git ls-remote "https://github.com/$repo" HEAD 2>/dev/null | cut -f1)
+    [[ -z $sha ]] && { warn "could not reach $repo"; return; }
+    grep -q "$sha" "$dst" && return 0
+    tmp=$(mktemp)
+    if curl -fsSL "https://raw.githubusercontent.com/$repo/$sha/$path" -o "$tmp"; then
+      { printf '# Vendored from https://github.com/%s/blob/%s/%s\n' "$repo" "$sha" "$path"
+        printf '# Refresh with ./deploy.sh --update and review the diff.\n'
+        cat "$tmp"; } > "$dst" && ok "refreshed $3 @ ${sha:0:10}"
     else
-      warn "could not download $1"
+      warn "could not download $repo/$path @ $sha"
     fi
     rm -f "$tmp"
   }
-  vendor https://raw.githubusercontent.com/ahmetb/kubectl-aliases/master/.kubectl_aliases zsh/kubectl_aliases.zsh 2
-  vendor https://raw.githubusercontent.com/seebi/dircolors-solarized/master/dircolors.ansi-dark dircolors.ansi-dark 2
+  vendor ahmetb/kubectl-aliases      .kubectl_aliases     zsh/kubectl_aliases.zsh
+  vendor seebi/dircolors-solarized   dircolors.ansi-dark  dircolors.ansi-dark
 fi
 ZSH_PLUGIN_DIR=${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins
 VIM_PACK_DIR=$HOME/.vim/pack/plugins/start

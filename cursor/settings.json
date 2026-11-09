@@ -17,5 +17,8 @@
   },
   "window.autoDetectColorScheme": false,
   "python.defaultInterpreterPath": "/Users/glen/projects/hex/.devbox/nix/profile/default/bin/python",
-  "cursor.composer.queueMessageDefaultBehavior": "steer"
+  "cursor.composer.queueMessageDefaultBehavior": "steer",
+  // extensions are pinned in cursor/extensions.list; show updates, don't install them silently
+  "extensions.autoUpdate": false,
+  "extensions.autoCheckUpdates": true
 }

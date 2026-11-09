@@ -1,4 +1,4 @@
-# Vendored from https://github.com/ahmetb/kubectl-aliases (commit 7549fa45bbde7499b927c74cae13bfb9169c9497).
+# Vendored from https://github.com/ahmetb/kubectl-aliases/blob/7549fa45bbde7499b927c74cae13bfb9169c9497/.kubectl_aliases
 # Refresh with ./deploy.sh --update and review the diff.
 # Copyright 2019 Google Inc.
 #

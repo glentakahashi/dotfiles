@@ -1,5 +1,5 @@
-# Vendored from https://github.com/seebi/dircolors-solarized dircolors.ansi-dark
-# (commit bd9d473393a78366d5c3658d9cd2db7d8944b447). Refresh with ./deploy.sh --update.
+# Vendored from https://github.com/seebi/dircolors-solarized/blob/bd9d473393a78366d5c3658d9cd2db7d8944b447/dircolors.ansi-dark
+# Refresh with ./deploy.sh --update and review the diff.
 # Exact Solarized Dark color theme for the color GNU ls utility.
 # Designed for dircolors (GNU coreutils) 5.97
 #
