@@ -104,6 +104,8 @@ alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}
 # hex dev server (from `coach`: typed ~350x)
 alias hw='hdev watch'
 alias hwl='hdev watch:local'
+alias hi='hdev install'
+alias hpi='hdev poetry install'
 
 # claude
 alias cl='claude'
