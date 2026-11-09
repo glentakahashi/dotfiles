@@ -123,7 +123,6 @@ link "$DOTFILES/zshrc"                      ~/.zshrc
 link "$DOTFILES/zshrc.fzf"                  ~/.zshrc.fzf
 link "$DOTFILES/$SYSTEM/zshrc.system"       ~/.zshrc.system
 link "$DOTFILES/tmux.conf"                  ~/.tmux.conf
-link "$DOTFILES/tmux.reset.conf"            ~/.tmux.reset.conf
 link "$DOTFILES/$SYSTEM/tmux.system.conf"   ~/.tmux.system.conf
 link "$DOTFILES/vimrc"                      ~/.vimrc
 link "$DOTFILES/vimplug"                    ~/.vimplug
@@ -137,6 +136,10 @@ if [[ $SYSTEM == darwin ]]; then
   code_settings=~/Library/Application\ Support/Code/User/settings.json
   [[ -L $code_settings && "$(readlink "$code_settings")" == "$DOTFILES/"* ]] && rm "$code_settings" && ok "removed stale VS Code settings link"
 fi
+# links to files that have since been deleted from the repo
+for l in ~/.* ~/.config/*/* ~/.local/bin/*; do
+  [[ -L $l && ! -e $l && "$(readlink "$l")" == "$DOTFILES/"* ]] && rm "$l" && ok "removed stale link ${l/#$HOME/~}"
+done
 
 step "Local override files"
 for f in ~/.zshrc.local ~/.tmux.local.conf ~/.vimrc.local; do
