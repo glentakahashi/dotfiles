@@ -28,7 +28,7 @@
   find = !"git log --source --all -S "
 
   #clone one of my own repos
-  cc = !"git clone git@github.com:glentakahashi/$1"
+  cc = "!f() { git clone git@github.com:glentakahashi/$1; }; f"
 
   # Show the diff between the latest commit and the current state
   d = !"git diff-index --quiet HEAD --; git --no-pager diff --patch-with-stat"
@@ -44,5 +44,41 @@
   # Amend the currently staged files to the latest commit
   amend = commit --amend --reuse-message=HEAD
 
+  # safer than `push --force` (you run that ~56x): refuses if the remote moved
+  pf = push --force-with-lease
+  unstage = reset HEAD --
+  # make a fixup! commit for <sha>; squashed automatically by `rebase -i` (autoSquash)
+  fixup = commit --fixup
+  # branches by most recent commit
+  recent = branch --sort=-committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) %(color:blue)%(committerdate:relative)%(color:reset) %(contents:subject)'
+
 [rebase]
   instructionFormat = (%an <%ae>) %s
+  autoSquash = true
+  autoStash = true
+  # moves intermediate branch pointers when rebasing a stack of branches
+  updateRefs = true
+
+[push]
+  autoSetupRemote = true
+
+[fetch]
+  prune = true
+
+[help]
+  # `git stauts` -> "Did you mean status? [y/N]" (you have ~30 such typos in history)
+  autocorrect = prompt
+
+[rerere]
+  # remember conflict resolutions; helps with repeated rebases onto master
+  enabled = true
+
+[diff]
+  algorithm = histogram
+  colorMoved = default
+
+[merge]
+  conflictStyle = zdiff3
+
+[branch]
+  sort = -committerdate
