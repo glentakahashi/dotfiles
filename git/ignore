@@ -1,0 +1,23 @@
+# Global gitignore, linked to ~/.config/git/ignore (git's default location, so
+# no core.excludesFile needed). ripgrep and fd read it too, which makes it the
+# global search ignore list as well.
+# Keep it to OS/editor/tool junk: anything here silently vanishes from
+# `git status` in every repo.
+
+# OS
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# editors
+*.swp
+*.swo
+*~
+.idea/
+
+# tools
+**/.claude/settings.local.json
+.direnv/
+__pycache__/
+*.pyc

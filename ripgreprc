@@ -1,0 +1,7 @@
+# ripgrep defaults. zshrc points RIPGREP_CONFIG_PATH at ~/.config/ripgrep/config,
+# which links here. Global ignores come from ~/.config/git/ignore (git/ignore in
+# this repo), which git, rg and fd all read.
+--smart-case
+# don't flood the terminal with minified JS / lockfile lines
+--max-columns=300
+--max-columns-preview

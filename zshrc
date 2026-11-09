@@ -27,6 +27,7 @@ export LANG=en_US.UTF-8
 export EDITOR="vim"
 export VISUAL="vim"
 export AWS_PAGER=""
+export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/config   # -> $DOTFILES/ripgreprc
 DISABLE_UNTRACKED_FILES_DIRTY=true   # prompt: untracked files don't mark the repo dirty
 
 # system specific PATH, colors, aliases (darwin/ or linux-gnu/)
@@ -120,11 +121,6 @@ psg() { ps aux | grep -i -- "[${1[1]}]${1[2,-1]}" }
 # what's listening on a port: `port 3000` (or all with no arg)
 port() { lsof -nP -iTCP${1:+:$1} -sTCP:LISTEN }
 mkcd() { mkdir -p -- "$1" && cd -- "$1" }
-# create a basic html file
-html() {
-  [[ -z $1 ]] && { echo "Enter a path to create a basic html file at."; return 1 }
-  cp ~/.template.html $1
-}
 
 export PATH=$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH
 

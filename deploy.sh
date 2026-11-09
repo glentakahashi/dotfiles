@@ -125,8 +125,8 @@ link "$DOTFILES/tmux.conf"                  ~/.tmux.conf
 link "$DOTFILES/$SYSTEM/tmux.system.conf"   ~/.tmux.system.conf
 link "$DOTFILES/vimrc"                      ~/.vimrc
 link "$DOTFILES/vim/colors/solarized8.vim" ~/.vim/colors/solarized8.vim
-link "$DOTFILES/template.html"              ~/.template.html
-link "$DOTFILES/agignore"                   ~/.agignore
+link "$DOTFILES/ripgreprc"                  ~/.config/ripgrep/config
+link "$DOTFILES/git/ignore"                 ~/.config/git/ignore
 if [[ $SYSTEM == darwin ]]; then
   cursor_dir=~/Library/Application\ Support/Cursor/User
   link "$DOTFILES/cursor/settings.json"    "$cursor_dir/settings.json"

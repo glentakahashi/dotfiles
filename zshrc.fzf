@@ -1,5 +1,6 @@
 # fzf config, functions and widgets.
-# Everything degrades gracefully: fd/bat are used when installed, rg/cat otherwise.
+# Everything degrades gracefully: fd/rg/bat are used when installed, fzf's own
+# file walker / grep / head otherwise.
 #
 # Quick reference (run `fzf-help` for this list):
 #   files/search   fe fo fcd fvim gfv frg            ctrl-t alt-c alt-u **<tab>
@@ -40,18 +41,15 @@ elif (( $+commands[rg] )); then
   # respects .gitignore, so node_modules/build output stay out of the list
   export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
   _fzf_compgen_path() { rg --files --hidden --glob '!.git' "$1" 2>/dev/null }
-elif (( $+commands[ag] )); then
-  export FZF_DEFAULT_COMMAND='ag -p ~/.agignore -g ""'
-  _fzf_compgen_path() { ag -p ~/.agignore -g "" "$1" 2>/dev/null }
-fi
+fi   # neither: fzf (>= 0.48) walks the tree itself, skipping hidden dirs
 
-# line-oriented grep used by gfv/frg: prints file:line:text (rg preferred, ag fallback)
+# line-oriented grep used by gfv/frg: prints file:line:text
 if (( $+commands[rg] )); then
   _fzf_grep='rg --line-number --no-heading --color=always --smart-case'
   _fzf_grep_pathargs() { reply=(--glob "*$1*") }
-else
-  _fzf_grep="ag --nogroup --numbers --color --color-match 0 --smart-case -p $HOME/.agignore"
-  _fzf_grep_pathargs() { reply=(-G "$1") }
+else   # e.g. a box where deploy.sh hasn't run
+  _fzf_grep='grep -rnIi --color=always --exclude-dir=.git --exclude-dir=node_modules'
+  _fzf_grep_pathargs() { reply=(--include="*$1*") }
 fi
 export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
 
@@ -107,7 +105,7 @@ gfv() {
   vim "+${${sel#*:}%%:*}" -- "${sel%%:*}"
 }
 
-# frg [query] - live grep: each keystroke re-runs rg/ag (fast in big repos);
+# frg [query] - live grep: each keystroke re-runs rg (fast in big repos);
 #   ctrl-f switches to fuzzy-filtering the current results. Enter opens vim.
 frg() {
   local rg=$_fzf_grep
