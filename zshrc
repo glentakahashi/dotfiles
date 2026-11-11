@@ -76,7 +76,15 @@ KEYTIMEOUT=30
 # ---------------------------------------------------------------------------
 source $DOTFILES/zsh/git.zsh
 
-alias reload-zshrc='exec zsh'
+# Replace this process with a fresh login zsh: empty env, base PATH, full startup.
+# Plain `exec zsh` inherits the old PATH, so direnv/devbox entries end up behind homebrew.
+reload-zshrc() {
+  local -a keep=(HOME USER LOGNAME SHELL PWD TERM COLORTERM TERM_PROGRAM TERM_PROGRAM_VERSION
+                 LANG LC_ALL TMPDIR SSH_AUTH_SOCK SSH_CONNECTION SSH_TTY TMUX TMUX_PANE)
+  local -a envs=() v
+  for v in $keep; do [[ -n ${(P)v} ]] && envs+=("$v=${(P)v}"); done
+  exec env -i "${envs[@]}" PATH=/usr/bin:/bin:/usr/sbin:/sbin "$SHELL" -l
+}
 alias grip='grep -riI'
 alias http='python3 -m http.server'
 # most common commands - useful for deciding what else to alias
@@ -106,6 +114,7 @@ alias hw='hdev watch'
 alias hwl='hdev watch:local'
 alias hi='hdev install'
 alias hpi='hdev poetry install'
+alias rd='./scripts/run-dev.sh'
 
 # claude
 alias cl='claude'
