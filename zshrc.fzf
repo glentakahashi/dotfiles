@@ -53,8 +53,10 @@ else   # e.g. a box where deploy.sh hasn't run
 fi
 export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
 
+# alt-j/k move the selection: inline, tmux turns them into ctrl-j/k, but in a
+# --tmux popup fzf gets them raw. Preview scrolls with shift-up/down (default).
 export FZF_DEFAULT_OPTS="--height 50% --layout=reverse --border --info=inline-right --cycle
-  --bind 'ctrl-/:toggle-preview,alt-j:preview-down,alt-k:preview-up,alt-a:toggle-all'"
+  --bind 'ctrl-/:toggle-preview,alt-j:down,alt-k:up,alt-a:toggle-all'"
 # Inside tmux, open fzf in a floating popup instead of inline (fzf >= 0.53,
 # tmux >= 3.3). Outside tmux the option is ignored. Set FZF_NO_POPUP=1 in
 # ~/.zshrc.local to turn it off.

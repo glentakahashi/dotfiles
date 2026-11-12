@@ -34,7 +34,7 @@ zstyle ':completion:*' menu no                     # let fzf-tab handle the menu
 if [[ -f $ZSH_PLUGINS/fzf-tab/fzf-tab.plugin.zsh ]]; then
   source $ZSH_PLUGINS/fzf-tab/fzf-tab.plugin.zsh
   zstyle ':fzf-tab:*' switch-group '<' '>'
-  zstyle ':fzf-tab:*' fzf-flags --height=50%
+  zstyle ':fzf-tab:*' fzf-flags --height=50% --bind=alt-j:down,alt-k:up
   # match zshrc.fzf: tab completion in a tmux popup too
   [[ -n $TMUX && -z $FZF_NO_POPUP ]] && zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
   zstyle ':fzf-tab:complete:(cd|z|ls|vim|cat|bat):*' fzf-preview \
