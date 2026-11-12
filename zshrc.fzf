@@ -160,7 +160,7 @@ _fzf_checkout() {
     sed "s/.* //" | sed "s#remotes/[^/]*/##" |
     awk '!x[$0]++' | awk '{print "\x1b[34;1mbranch\x1b[m\t" $1}')
   target=$(
-    (echo "$branches"; echo "$tags") |
+    print -rl -- $branches $tags |   # unquoted: an empty list (no tags) adds no blank line
     fzf --no-hscroll --ansi +m -d "\t" -n 2 --query="$2" \
         --preview "$_fzf_git_log_preview {2} 2>/dev/null || $_fzf_git_log_preview origin/{2}") || return
   git checkout "$(echo "$target" | awk '{print $2}')"
